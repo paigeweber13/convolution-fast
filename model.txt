@@ -1,0 +1,39 @@
+Question: How many Flops needs to be done to compute a convolution of dimension
+k on a image of size n × m?
+ - for now, let's ignore edge cases
+ - need to do (n-1)(m-1) convolutions
+ - each convolution requires (k * k) - 1 floating mul and (k * k) - 1 floating
+   adds.
+ - below is a funciton f that computes number of flops for a given k, n, and m
+ - f(k, n, m) = (n-1) * (m-1) * 2(k * k - 1)
+
+Question: How much memory needs to be moved to compute a convolution of
+dimension k on a image of size n × m?
+ - need to read k * k * datatype_size bytes for convolution matrix 
+ - need to read (n-1) * (m-1) * datatype_size bytes for input matrix
+ - need to write n * n * datatype_size bytes for output
+totals: 
+ - total read: k * k + (n-1) * (m-1) * datatype_size bytes
+ - total write: n * m * datatype_size bytes
+
+Question: Assuming the performance numbers you measured in assignment 1 and 2,
+how long should computing a convolution of dimension 3 on an image of 1024 ×
+768 take?
+ - performance numbers: 1.64 TFlop/s and 100 GB/s bandwidth
+ - flop performance in pixels/second: num_pixels / flop_time
+        num_pixels/(flops_to_compute/flops_possible_on_machine)
+        (n-1)(m-1)/((n-1) * (m-1) * 2(k * k - 1)/1.64e12)
+ - memory performance in pixels/second: num_pixels / mem_time
+        num_pixels/(num_bytes_to_access/bandwidth_in_bytes)
+
+Question: What about a convolution of dimension 11 ? On this kind of problem,
+performance is usually reported in pixel processed per second.
+
+Question: Plot maximum expected performance as a function of k.
+
+QUESTIONS:
+ - can we just not compute edges?
+ - "dimension" means length of one side right?
+ - computed latency incorrectly... should I resubmit?
+    - minus 4 points if I turn in today for being late
+    - will I make up more than 4 points?
