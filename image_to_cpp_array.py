@@ -17,6 +17,11 @@ def main():
     filename = 'saturn-v-2048x2048-bw'
     image = io.imread(filename + '.jpg')
     image_to_csv(image, filename + '.csv')
+    # note: filters.sobel_v uses the following kernel:
+    # 1   0  -1
+    # 2   0  -2
+    # 1   0  -1
+    # source: https://scikit-image.org/docs/dev/api/skimage.filters.html#skimage.filters.sobel_v
     edges = filters.sobel_v(image)
     io.imsave(filename + '-expected-sobel-v.jpg', edges)
 
