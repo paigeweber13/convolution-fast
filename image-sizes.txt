@@ -1,11 +1,24 @@
-Images of 
-your-name
+Image sizes:
 2048 × 2048
 8192 × 8192
 
 1024 × 768
 4194304 × 768
 16777216 × 768
+
+some kernels I can use
+sobel_v:
+1   0  -1
+2   0  -2
+1   0  -1
+
+gaussian blur 5x5:
+1/256 * 
+1  4   6   4   1 
+4  16  24  16  4 
+6  24  36  24  6 
+4  16  24  16  4 
+1  4   6   4   1
 
 convolutions of dimension 3, 5, 7, 9, 11, 13, and 15. 
 
