@@ -15,7 +15,6 @@ def plot_as_function_of_k(m, n, datatype_size):
         y_flop.append(flop_perf_bound(m,n,k))
         y_mem.append(mem_perf_bound(m,n,k,datatype_size))
 
-    print(y_mem)
     plt.figure(figsize=(15,7))
     plt.yscale('log')
     plt.title('Performance Bounds as Functions of Convolution Dimension')
