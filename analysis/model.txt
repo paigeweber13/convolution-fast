@@ -29,12 +29,16 @@ how long should computing a convolution of dimension 3 on an image of 1024 ×
         
  - for k = 3, n = 1024, m = 768, datatype_size = 1 (uint8):
        - flop performance bound is 9.1e10 pixels per second
-       - mem performance bound is 2.9e3 pixels per second
+       - mem performance bound is 3.3e10 pixels per second
 
 Question: What about a convolution of dimension 11 ? On this kind of problem,
 performance is usually reported in pixel processed per second.
  - for k = 11, n = 1024, m = 768, datatype_size = 1 (uint8):
        - flop performance bound is 6.7e9 pixels per second
-       - mem performance bound is 2.1e2 pixels per second
+       - mem performance bound is 3.3e10 pixels per second
 
 Question: Plot maximum expected performance as a function of k.
+ - see 'perf_bounds_plot.png'
+ - seems that for increasing k, the flop performance decreases but the memory
+   performance remains about the same. This makes sense, as k is read-only and
+   also very small compared to n and m.
