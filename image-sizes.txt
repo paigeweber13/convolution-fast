@@ -1,0 +1,12 @@
+Images of 
+your-name
+2048 × 2048
+8192 × 8192
+
+1024 × 768
+4194304 × 768
+16777216 × 768
+
+convolutions of dimension 3, 5, 7, 9, 11, 13, and 15. 
+
+each convolution for each image. So 35 combinations.
