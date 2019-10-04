@@ -17,7 +17,8 @@ def main():
     filename = 'saturn-v-2048x2048-bw'
     image = io.imread(filename + '.jpg')
     image_to_csv(image, filename + '.csv')
-    edges = filters.sobel(image)
+    edges = filters.sobel_v(image)
+    io.imsave(filename + '-expected-sobel-v.jpg', edges)
 
 if __name__ == "__main__":
     main()
