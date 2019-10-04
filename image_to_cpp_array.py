@@ -14,7 +14,7 @@ def image_to_csv(image_array: np.ndarray, output_filename: str):
             f.write(output_string)
                 
 def main():
-    filename = 'saturn-v-2048x2048-bw'
+    filename = 'tests/saturn-v-2048x2048-bw'
     image = io.imread(filename + '.jpg')
     image_to_csv(image, filename + '.csv')
     # note: filters.sobel_v uses the following kernel:
