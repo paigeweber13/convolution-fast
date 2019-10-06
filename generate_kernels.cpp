@@ -29,7 +29,7 @@ vector<vector<float>> generate_kernel(size_t k){
 
 vector<vector<vector<float>>> generate_kernels(size_t max_k){
   vector<vector<vector<float>>> result(max_k+1);
-  for(size_t i = 1; i <= max_k; i += 2){
+  for(size_t i = 3; i <= max_k; i += 2){
     result[i] = generate_kernel(i);
   }
   return result;
