@@ -17,10 +17,13 @@ vector<vector<float>> generate_kernel(size_t k){
   // will need tuning
   float std_dev = float(k) * 2/3;
 
+  // to silence compiler warnings
+  int int_k = int(k);
+
   int half = ceil(k/2);
-  for(int row = 0; row < k; row++){
+  for(int row = 0; row < int_k; row++){
     result.push_back(vector<float>(k));
-    for(int column = 0; column < k; column++){
+    for(int column = 0; column < int_k; column++){
       result[row][column] = bivariate_gaussian(std_dev, column-half, row-half);
     }
   }
