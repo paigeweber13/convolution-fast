@@ -14,6 +14,3 @@ test: compile
 
 clean:
 		rm -f *.e* *.o* *.s
-
-plot:
-		python plot_data.py data/randomly-allocated-list-latency.csv data/sequentially-allocated-list-latency.csv
