@@ -14,6 +14,7 @@ class Kernel {
     Kernel();
     Kernel(size_t k);
     ~Kernel();
+    int get_midpoint();
     float get(int x, int y);
     void set(int x, int y, float value);
     string to_string();

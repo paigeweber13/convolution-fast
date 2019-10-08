@@ -25,6 +25,10 @@ Kernel::Kernel(size_t k){
 Kernel::~Kernel(){
 }
 
+int Kernel::get_midpoint(){
+  return midpoint;
+}
+
 float Kernel::get(int x, int y){
   return values[midpoint+x][midpoint+y];
 }
