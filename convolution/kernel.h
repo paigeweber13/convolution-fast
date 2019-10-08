@@ -15,7 +15,7 @@ class Kernel {
     Kernel(size_t k);
     ~Kernel();
     float get(int x, int y);
-    float set(int x, int y, float value);
+    void set(int x, int y, float value);
     string to_string();
 
   private:

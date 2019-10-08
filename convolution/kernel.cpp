@@ -29,7 +29,7 @@ float Kernel::get(int x, int y){
   return values[midpoint+x][midpoint+y];
 }
 
-float Kernel::set(int x, int y, float value){
+void Kernel::set(int x, int y, float value){
   values[midpoint+x][midpoint+y] = value;
 }
 
