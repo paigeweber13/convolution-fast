@@ -2,6 +2,7 @@
 
 // third party
 #include <cstdint>
+#include <string>
 #include <vector>
 
 // my stuff

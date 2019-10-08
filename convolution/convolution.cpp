@@ -29,9 +29,12 @@ vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel){
 
 int main(int argc, char** argv){
   // two possible usages
-  auto usage1 = argv[0] + " n m k";
-  auto usage2 = argv[0] + " input_image_data.csv";
+  string usage1 = string(argv[0]) + " n m k";
+  string usage2 = string(argv[0]) + " input_image_data.csv";
 
-  if(argc < )
+  if(argc < 4){
+
+  }
+
   return 0;
 }
