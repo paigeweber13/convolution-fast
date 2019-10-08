@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-Wall -std=c++1y -march=native -mtune=native -fopenmp -O3
 CXXASSEMBLYFLAGS=-S -g -fverbose-asm
-FILES=test_generate_kernels.cpp $(wildcard ../convolution/*.cpp)
+FILES=test_generate_kernels.cpp ../convolution/kernel.cpp ../convolution/generate_kernels.cpp
 
 assembly: $(FILES)
 		$(CXX) $(CXXFLAGS) $(CXXASSEMBLYFLAGS) $(FILES)
