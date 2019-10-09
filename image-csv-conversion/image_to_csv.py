@@ -29,7 +29,7 @@ def main():
     if len(sys.argv) < 2:
         print("usage:", sys.argv[0], "file-to-convert.jpg")
         sys.exit(1)
-    load_and_convert(''.join(sys.argv[1].split('.')[0]))
+    load_and_convert(sys.argv[1][:-4])
 
 if __name__ == "__main__":
     main()
