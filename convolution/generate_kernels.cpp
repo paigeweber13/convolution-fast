@@ -12,17 +12,20 @@ float bivariate_gaussian(float std_dev, float x, float y){
 
 Kernel generate_sobel_v_kernel(){
   Kernel result(3);
-  result.set(-1,  1,  1);
-  result.set( 0,  1,  0);
-  result.set( 1,  1, -1);
 
-  result.set(-1,  0,  2);
-  result.set( 0,  0,  0);
-  result.set( 1,  0, -2);
+  // doesn't seem to work?
+  result.values[0][0] = -1;
+  result.values[0][1] =  0;
+  result.values[0][2] =  1;
 
-  result.set(-1, -1,  1);
-  result.set( 0, -1,  0);
-  result.set( 1, -1, -1);
+  result.values[1][0] = -2;
+  result.values[1][1] =  0;
+  result.values[1][2] =  2;
+
+  result.values[2][0] = -1;
+  result.values[2][1] =  0;
+  result.values[2][2] =  1;
+
   return result;
 }
 
@@ -30,21 +33,22 @@ Kernel generate_blur_kernel(size_t k){
   Kernel result(k);
   // will need tuning
   // float std_dev = float(k) * 2/3;
-  float std_dev = 1.0;
+  float std_dev = 3.0;
 
   int half = ceil(k/2);
   float sum = 0.0;
   for(int x = -half; x <= half; x++){
     for(int y = -half; y <= half; y++){
-      result.set(x ,y, bivariate_gaussian(std_dev, x, y));
-      sum += result.get(x, y);
+      auto current_value = bivariate_gaussian(std_dev, x, y);
+      result.values[x+half][y+half] = current_value;
+      sum += current_value;
     }
   }
 
   // normalize!
-  for(int x = -half; x <= half; x++){
-    for(int y = -half; y <= half; y++){
-      result.set(x, y, result.get(x, y)/sum);
+  for(size_t i = 0; i < result.values.size(); i++){
+    for(size_t j = 0; j < result.values[i].size(); j++){
+      result.values[i][j] /= sum;
     }
   }
 
