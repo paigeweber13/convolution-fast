@@ -17,3 +17,4 @@ using namespace std;
 vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel);
 vector<vector<uint8_t>> load_image(string filename);
 void save_image(vector<vector<uint8_t>> image, string filename);
+vector<vector<uint8_t>> generate_garbage_image(size_t m, size_t n);
