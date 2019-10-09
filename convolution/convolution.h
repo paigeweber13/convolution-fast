@@ -1,6 +1,7 @@
 #pragma once
 
 // third party
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
 #include <string>
@@ -8,6 +9,7 @@
 
 // my stuff
 #include "kernel.h"
+#include "generate_kernels.h"
 
 using namespace std;
 

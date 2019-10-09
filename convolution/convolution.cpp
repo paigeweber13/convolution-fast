@@ -16,9 +16,11 @@ vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel){
         float sum = 0;
         for(int k = -m; k <= m; k++){
           for(int l = -m; l <= m; l++){
-            sum += image[i+k][j+k] * kernel.get(k, l);
+            sum += image[i+l][j+k] * kernel.get(k, l);
           }
         }
+        // clamp to prevent overflow
+        sum = min(sum, 255.0f);
         output_image[i][j] = uint8_t(sum);
       }
     }
@@ -74,16 +76,16 @@ void save_image(vector<vector<uint8_t>> image, string filename){
 int main(int argc, char** argv){
   // two possible usages
   string usage1 = string(argv[0]) + " n m k";
-  string usage2 = string(argv[0]) + " input_image_data.csv k";
+  string usage2 = string(argv[0]) + " input_image_data.csv";
 
-  if(argc < 3){
+  if(argc < 2){
     cout << "usages:" << endl;
     cout << usage1 << endl;
     cout << usage2 << endl;
   } else if(argc < 4){
     auto image = load_image(argv[1]);
-    save_image(image, "output.csv");
-
+    auto edges = convolve(image, generate_sobel_v_kernel());
+    save_image(edges, "output.csv");
   } else {
     // generate dummy image of size n, m and kernel of size k. Convolve them
     // and report time.
