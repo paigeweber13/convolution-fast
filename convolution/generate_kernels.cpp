@@ -10,6 +10,22 @@ float bivariate_gaussian(float std_dev, float x, float y){
     exp(-(pow(x, 2) + pow(y, 2))/(2*pow(std_dev,2)));
 }
 
+Kernel generate_sobel_v_kernel(){
+  Kernel result(3);
+  result.set(-1,  1,  1);
+  result.set( 0,  1,  0);
+  result.set( 1,  1, -1);
+
+  result.set(-1,  0,  2);
+  result.set( 0,  0,  0);
+  result.set( 1,  0, -2);
+
+  result.set(-1, -1,  1);
+  result.set( 0, -1,  0);
+  result.set( 1, -1, -1);
+  return result;
+}
+
 Kernel generate_blur_kernel(size_t k){
   Kernel result(k);
   // will need tuning
