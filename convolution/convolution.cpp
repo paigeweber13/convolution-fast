@@ -73,9 +73,21 @@ void save_image(vector<vector<uint8_t>> image, string filename){
   output.close();
 }
 
+// m is length, n is height
+vector<vector<uint8_t>> generate_garbage_image(size_t m, size_t n){
+  vector<vector<uint8_t>> result(n);
+  for(size_t i = 0; i < n; i++){
+    result[i] = vector<uint8_t>(m);
+    for(size_t j = 0; j < m; j++){
+      result[i][j] = rand() % 256;
+    }
+  }
+  return result;
+}
+
 int main(int argc, char** argv){
   // two possible usages
-  string usage1 = string(argv[0]) + " n m k";
+  string usage1 = string(argv[0]) + " m n k";
   string usage2 = string(argv[0]) + " input_image_data.csv";
 
   if(argc < 2){
@@ -90,6 +102,17 @@ int main(int argc, char** argv){
   } else {
     // generate dummy image of size n, m and kernel of size k. Convolve them
     // and report time.
+    auto image = generate_garbage_image(stoi(argv[1]), stoi(argv[2]));
+    auto kernel = generate_blur_kernel(stoi(argv[3]));
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    auto output = convolve(image, kernel);
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
+    double duration_seconds = duration/10e9;
+    cout << to_string(duration_seconds) << endl;
   }
 
   return 0;
