@@ -9,19 +9,19 @@ vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel){
   {
     // don't compute edges
     #pragma omp for
-    for(size_t i = m; i < image.size() - m; i++){
+    for(size_t i = 0; i < (image.size() - 2*m); i++){
       // for each row
-      for(size_t j = m; j < image[i].size() - m; j++){
+      for(size_t j = 0; j < (image[i].size() - 2*m); j++){
         // for each pixel in that row
         float sum = 0;
-        for(int k = -m; k <= m; k++){
-          for(int l = -m; l <= m; l++){
-            sum += image[i+l][j+k] * kernel.get(k, l);
+        for(size_t k = 0; k < kernel.values.size(); k++){
+          for(size_t l = 0; l < kernel.values[k].size(); l++){
+            sum += image[i+k][j+l] * kernel.values[k][l];
           }
         }
         // clamp to prevent overflow
         sum = min(sum, 255.0f);
-        output_image[i][j] = uint8_t(sum);
+        output_image[i+m][j+m] = uint8_t(sum);
       }
     }
   }
@@ -84,7 +84,8 @@ int main(int argc, char** argv){
     cout << usage2 << endl;
   } else if(argc < 4){
     auto image = load_image(argv[1]);
-    auto edges = convolve(image, generate_sobel_v_kernel());
+    // auto edges = convolve(image, generate_sobel_v_kernel());
+    auto edges = convolve(image, generate_blur_kernel(5));
     save_image(edges, "output.csv");
   } else {
     // generate dummy image of size n, m and kernel of size k. Convolve them
