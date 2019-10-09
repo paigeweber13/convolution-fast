@@ -11,6 +11,7 @@ compile: $(FILES)
 
 test: compile
 		./a.out ../tests/saturn-v-2048x2048-bw.csv 3
+		python ../image-csv-conversion/csv_to_image.py output.csv
 
 clean:
 		rm -f *.e* *.o* *.s
