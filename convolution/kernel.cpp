@@ -5,21 +5,18 @@ Kernel::Kernel(){
 }
 
 Kernel::Kernel(size_t k){
-  if (k % 2 == 0){
-    throw "Unusable k. K must be odd.";
-  } else if (k < 3){
+  if (k < 3){
     throw "Unusable k. K must be at least 3.";
-  }
+  } else if (k % 2 == 0){
+    throw "Unusable k. K must be odd.";
+  } 
 
   for (size_t i = 0; i < k; i++){
     values.push_back(vector<float>(k));
   }
 
   this->k = k;
-  // cout << "k: " << this->k << endl;
   midpoint = size_t(ceil(k/2));
-  // this->half = midpoint - 1;
-  // cout << this->to_string() << endl;
 }
 
 Kernel::~Kernel(){
@@ -29,22 +26,14 @@ int Kernel::get_midpoint(){
   return midpoint;
 }
 
-float Kernel::get(int x, int y){
-  return values[midpoint+x][midpoint+y];
-}
-
-void Kernel::set(int x, int y, float value){
-  values[midpoint+x][midpoint+y] = value;
-}
-
 string Kernel::to_string(){
   stringstream ss;
   ss << "k: " << k << endl;
   ss << "Midpoint: " << midpoint << endl;
   ss << "Kernel:" << endl;
-  for(int x = -midpoint; x <= midpoint; x++){
-    for(int y = midpoint; y >= -midpoint; y--){
-      ss << fixed << setprecision(4) << get(x, y) << "  ";
+  for(size_t i = 0; i < values.size(); i++){
+    for(size_t j = 0; j < values[i].size(); j++){
+      ss << fixed << setprecision(4) << values[i][j] << "  ";
     }
     ss << endl;
   }
