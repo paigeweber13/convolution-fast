@@ -43,7 +43,7 @@ vector<vector<uint8_t>> load_image(string filename){
     while(current != string::npos){
       row.push_back(stoi(line.substr(previous, current-previous)));
       previous = current + 1;
-      current = line.find(delim);
+      current = line.find(delim, previous);
     }
     row.push_back(stoi(line.substr(previous, current-previous)));
     image.push_back(row);
@@ -56,12 +56,13 @@ vector<vector<uint8_t>> load_image(string filename){
 
 void save_image(vector<vector<uint8_t>> image, string filename){
   ofstream output;
+  output.open(filename);
   string row_output;
 
   for(auto row : image){
     row_output = "";
     for(auto pixel : row){
-      row_output += pixel + ",";
+      row_output += to_string(pixel) + ",";
     }
     row_output.back() = '\n';
     output << row_output;
@@ -81,6 +82,7 @@ int main(int argc, char** argv){
     cout << usage2 << endl;
   } else if(argc < 4){
     auto image = load_image(argv[1]);
+    save_image(image, "output.csv");
 
   } else {
     // generate dummy image of size n, m and kernel of size k. Convolve them
