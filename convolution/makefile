@@ -10,7 +10,7 @@ compile: $(FILES)
 		$(CXX) $(CXXFLAGS) $(FILES)
 
 test: compile
-		./a.out ../tests/saturn-v-2048x2048-bw.csv
+		./a.out ../tests/saturn-v-2048x2048-bw.csv 3
 
 clean:
 		rm -f *.e* *.o* *.s
