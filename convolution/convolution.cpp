@@ -27,13 +27,64 @@ vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel){
   return output_image;
 }
 
+vector<vector<uint8_t>> load_image(string filename){
+  ifstream input;
+  input.open(filename);
+  string line;
+  vector<vector<uint8_t>> image;
+  std::size_t current, previous;
+  string delim = ",";
+
+  while(getline(input, line)){
+    vector<uint8_t> row;
+    current = 0;
+    previous = 0;
+    current = line.find(delim);
+    while(current != string::npos){
+      row.push_back(stoi(line.substr(previous, current-previous)));
+      previous = current + 1;
+      current = line.find(delim);
+    }
+    row.push_back(stoi(line.substr(previous, current-previous)));
+    image.push_back(row);
+  }
+
+  input.close();
+
+  return image;
+}
+
+void save_image(vector<vector<uint8_t>> image, string filename){
+  ofstream output;
+  string row_output;
+
+  for(auto row : image){
+    row_output = "";
+    for(auto pixel : row){
+      row_output += pixel + ",";
+    }
+    row_output.back() = '\n';
+    output << row_output;
+  }
+
+  output.close();
+}
+
 int main(int argc, char** argv){
   // two possible usages
   string usage1 = string(argv[0]) + " n m k";
-  string usage2 = string(argv[0]) + " input_image_data.csv";
+  string usage2 = string(argv[0]) + " input_image_data.csv k";
 
-  if(argc < 4){
+  if(argc < 3){
+    cout << "usages:" << endl;
+    cout << usage1 << endl;
+    cout << usage2 << endl;
+  } else if(argc < 4){
+    auto image = load_image(argv[1]);
 
+  } else {
+    // generate dummy image of size n, m and kernel of size k. Convolve them
+    // and report time.
   }
 
   return 0;
