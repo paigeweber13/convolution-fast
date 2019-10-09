@@ -13,5 +13,8 @@ test: compile
 		./a.out ../tests/saturn-v-2048x2048-bw.csv 3
 		python ../image-csv-conversion/csv_to_image.py output.csv
 
+speedtest: compile
+		./a.out 100 100 3
+
 clean:
 		rm -f *.e* *.o* *.s
