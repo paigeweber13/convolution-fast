@@ -1,3 +1,8 @@
+Future work:
+ - use pgm format
+ - support ppm?
+ - meme deep-fryer
+
 Image sizes:
 2048 × 2048
 8192 × 8192
