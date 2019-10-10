@@ -21,8 +21,8 @@ double time_single_test(vector<vector<uint8_t>> image, unsigned m, unsigned n,
 
     auto end_time = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
-    double duration_milliseconds = duration/10e6;
-    return duration_milliseconds;
+    double duration_seconds = duration/10e9;
+    return duration_seconds;
 }
 
 void test_and_output_various_sizes(){
@@ -38,7 +38,7 @@ void test_and_output_various_sizes(){
   unsigned kernel_sizes[7] = {3, 5, 7, 9, 11, 13, 15};
 
   // m is length, n is height
-  cout << "m,n,k,time (ms)" << endl;
+  cout << "m,n,k,time (s)" << endl;
   // maximum size for all images. Reuse image between tests
 
   for (auto image_size : image_sizes){
