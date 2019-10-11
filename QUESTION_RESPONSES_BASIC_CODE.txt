@@ -9,7 +9,22 @@ max_gigapixels_per_second:    5.958
 min_gigapixels_per_second:    0.485
 
 I feel that median is giving us the most reliable aggregate data, so let's say
-I had an initial performance of 1.39 gigapixels per second. My model predicted 
+I had an initial performance of 1.39 gigapixels per second.
 
+For k = 3, my model predicted a performance of 33 gigapixels per second. I
+acheived at most 6 gigapixels per second for these small values of k.
+
+For k = 11, my model predicted a performance of 6.7 gigapixels per second. I
+consistently acheived about 1 gigapixel per second when k == 11.
+
+(I think the graph stored at data/speedtest001-performance-per-k.png is very
+useful to visualize this, and the performance per n*m graph may also be
+helpful.)
 
 Question: Why does the performance not always match the model?
+ - the model is incredibly idealistic. Our world is not.
+ - there is bound to be more speedup in my model somewhere. Given that
+   performance as a function on n*m was fairly constant when k was constant, it
+   is likely my flop performance that needs to be tuned the most. That being
+   said, my maximum speeds were still far below those bound by memory in my
+   model, so I will need to look at ways to improve memory performance.
