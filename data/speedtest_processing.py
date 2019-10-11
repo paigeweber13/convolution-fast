@@ -40,16 +40,33 @@ print('min_gigapixels_per_second:   ',
 # ax.set_zlabel('gigapixels/s')
 # plt.show()
 
-# # some projections
-# # gigapixels per second per n*m
-# plt.scatter(n_by_m, gigapixels_per_second)
-# # trend_line_coefficients = \
-# #     np.polynomial.polynomial.polyfit(n_by_m, gigapixels_per_second, 2)
-# # trend_line_function = np.poly1d(trend_line_coefficients)
-# # plt.plot(np.unique(n_by_m), trend_line_function(np.unique(n_by_m)))
-# plt.xlabel('n*m (approx. bytes loaded)')
-# plt.ylabel('performance in gigapixels per second')
-# plt.show()
+### some projections
+# common variables:
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+
+# gigapixels per second per n*m for each grouping of k
+data_by_k = {}
+
+possible_k = sorted(np.unique(data[:,2]))
+
+legend_values = []
+for k in possible_k:
+    legend_values.append('k: ' + str(k))
+    data_by_k[k] = np.array([x for x in data if x[2] == k])
+
+plt.figure(figsize=(15,9))
+i = 0
+for key in data_by_k:
+    plt.scatter(data_by_k[key][:,0] * data_by_k[key][:,0],
+                data_by_k[key][:,4], c=colors[i], marker='.')
+    i += 1
+
+plt.legend(legend_values)
+plt.xscale('log')
+plt.xlabel('n*m (approx. bytes loaded)')
+plt.ylabel('performance in gigapixels per second')
+plt.show()
+
 
 # gigapixels per second per k for each grouping of n*m
 data_by_size = {}
@@ -62,31 +79,22 @@ image_sizes = {
     (16777216 , 768),
 }
 
-colors = ['b', 'g', 'r', 'c', 'm']
-
+legend_values = []
 for m, n in image_sizes:
+    legend_values.append(str(m) + ' x ' + str(n) + ' pixels')
     new_entry = np.array([x for x in data if x[0] == m and x[1] == n])
     data_by_size[(m, n)] = new_entry
 
 data_by_size_keys_sorted = sorted(data_by_size.keys())
 
-legend_values = []
+plt.figure(figsize=(15,9))
 i = 0
 for key in data_by_size_keys_sorted:
-    print(key)
-    print(data_by_size[key])
-    # plt.scatter(data_by_size[key][:,2], data_by_size[key][:,4], c=colors[i])
-    legend_values.append(str(key[0]) + ' x ' + str(key[1]) + ' pixels')
     plt.plot(data_by_size[key][:,2], data_by_size[key][:,4], c=colors[i], 
              marker='.')
     i += 1
 
 plt.legend(legend_values)
-
-# trend_line_coefficients = \
-#     np.polynomial.polynomial.polyfit(k, gigapixels_per_second, 2)
-# trend_line_function = np.poly1d(trend_line_coefficients)
-# plt.plot(np.unique(k), trend_line_function(np.unique(k)))
 plt.xlabel('k')
 plt.ylabel('performance in gigapixels per second')
 plt.show()
