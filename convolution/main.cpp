@@ -46,9 +46,12 @@ void test_and_output_various_sizes(){
     auto n = image_size[1];
     auto image = generate_garbage_image(m, n);
     for (auto kernel_size : kernel_sizes){
+      auto single_test_time = time_single_test(image, m,n,kernel_size);
+      auto pixels_per_second = single_test_time/(m*n);
       cout << to_string(m) << "," << to_string(n) << ","
            << to_string(kernel_size) << ","
-           << to_string(time_single_test(image, m,n,kernel_size)) << endl;
+           << to_string(single_test_time) << ","
+           << to_string(pixels_per_second) << endl;
     }
   }
 }
