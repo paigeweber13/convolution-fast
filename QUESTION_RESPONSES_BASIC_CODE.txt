@@ -1,0 +1,15 @@
+Report measured performances in pixels per second and expected performance.
+
+I created a python script located at data/speedtest_processing.py that gives us
+basic aggregate information about the speed in gigapixels per second. Here is
+the output for my test after writing basic code:
+mean_gigapixels_per_second:   2.043
+median_gigapixels_per_second: 1.388
+max_gigapixels_per_second:    5.958
+min_gigapixels_per_second:    0.485
+
+I feel that median is giving us the most reliable aggregate data, so let's say
+I had an initial performance of 1.39 gigapixels per second. My model predicted 
+
+
+Question: Why does the performance not always match the model?
