@@ -8,12 +8,16 @@ vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel){
   #pragma omp parallel
   {
     // don't compute edges
+    // "#pragma omp for collapse(2)"
+    // this linearizes the two for loops - combines these two for lopos
+    // tiling will improve locality
     #pragma omp for
     for(size_t i = 0; i < (image.size() - 2*m); i++){
       // for each row
       for(size_t j = 0; j < (image[i].size() - 2*m); j++){
         // for each pixel in that row
         float sum = 0;
+        // unrolling loop will yield better performance
         for(size_t k = 0; k < kernel.values.size(); k++){
           for(size_t l = 0; l < kernel.values[k].size(); l++){
             sum += image[i+k][j+l] * kernel.values[k][l];
