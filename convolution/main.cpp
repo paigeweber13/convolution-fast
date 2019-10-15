@@ -38,7 +38,7 @@ void test_and_output_various_sizes(){
   unsigned kernel_sizes[7] = {3, 5, 7, 9, 11, 13, 15};
 
   // m is length, n is height
-  cout << "m,n,k,time (s)" << endl;
+  cout << "m,n,k,time (s),gigapixels per second" << endl;
   // maximum size for all images. Reuse image between tests
 
   for (auto image_size : image_sizes){
@@ -46,9 +46,12 @@ void test_and_output_various_sizes(){
     auto n = image_size[1];
     auto image = generate_garbage_image(m, n);
     for (auto kernel_size : kernel_sizes){
+      auto single_test_time = time_single_test(image, m,n,kernel_size);
+      auto gigapixels_per_second = single_test_time/(m*n*1e9);
       cout << to_string(m) << "," << to_string(n) << ","
            << to_string(kernel_size) << ","
-           << to_string(time_single_test(image, m,n,kernel_size)) << endl;
+           << to_string(single_test_time) << ","
+           << to_string(gigapixels_per_second) << endl;
     }
   }
 }
