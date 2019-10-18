@@ -35,12 +35,12 @@ Kernel generate_blur_kernel(size_t k){
   // float std_dev = float(k) * 2/3;
   float std_dev = 3.0;
 
-  int half = ceil(k/2);
   float sum = 0.0;
-  for(int x = -half; x <= half; x++){
-    for(int y = -half; y <= half; y++){
+  for(int x = -result.get_midpoint(); x <= result.get_midpoint(); x++){
+    for(int y = -result.get_midpoint(); y <= result.get_midpoint(); y++){
       auto current_value = bivariate_gaussian(std_dev, x, y);
-      result.values[x+half][y+half] = current_value;
+      result.values[x+result.get_midpoint()][y+result.get_midpoint()]
+        = current_value;
       sum += current_value;
     }
   }
