@@ -10,8 +10,7 @@ compile: $(FILES)
 		$(CXX) $(CXXFLAGS) $(FILES)
 
 test: compile
-		./a.out tests/saturn-v-2048x2048-bw.csv 3
-		python image-csv-conversion/csv_to_image.py output.csv
+		./a.out tests/saturn-v-2048x2048-bw.pgm 3
 
 speedtest: compile
 		./a.out

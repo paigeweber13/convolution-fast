@@ -13,6 +13,7 @@ class Kernel {
     Kernel();
     Kernel(size_t k);
     ~Kernel();
+    size_t get_k();
     int get_midpoint();
     vector<vector<float>> values;
     string to_string();

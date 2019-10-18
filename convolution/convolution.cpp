@@ -1,9 +1,13 @@
 #include "convolution.h"
 
+#include <iostream>
+
 vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel){
   auto m = kernel.get_midpoint();
+  auto k = kernel.get_k();
   // create new output image
   auto output_image = vector<vector<uint8_t>>(image);
+  // std::cout << "num rows: " << to_string(image.size()) << endl;
 
   #pragma omp parallel
   {
@@ -13,16 +17,18 @@ vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel){
     // tiling will improve locality
     #pragma omp for
     for(size_t i = 0; i < (image.size() - 2*m); i++){
+      // cout << "we are on row: " << to_string(i) << endl;
       // for each row
       for(size_t j = 0; j < (image[i].size() - 2*m); j++){
         // for each pixel in that row
         float sum = 0;
         // unrolling loop will yield better performance
-        for(size_t k = 0; k < kernel.values.size(); k++){
-          for(size_t l = 0; l < kernel.values[k].size(); l++){
-            sum += image[i+k][j+l] * kernel.values[k][l];
+        for(size_t n = 0; n < k; n++){
+          for(size_t o = 0; o < k; o++){
+            sum += image[i+n][j+o] * kernel.values[n][o];
           }
         }
+        // overflow is possible because of rounding errors....
         // clamp to prevent overflow
         sum = min(sum, 255.0f);
         output_image[i+m][j+m] = uint8_t(sum);
@@ -37,22 +43,50 @@ vector<vector<uint8_t>> load_image(string filename){
   ifstream input;
   input.open(filename);
   string line;
-  vector<vector<uint8_t>> image;
   std::size_t current, previous;
-  string delim = ",";
+  string delim = " ";
 
+  // skip first line, we just support P2
+  getline(input, line);
+
+  // second line has width and height
+  getline(input, line);
+  auto i = line.find(delim);
+  size_t width = stoi(line.substr(0, i));
+  auto j = line.find(delim);
+  size_t height = stoi(line.substr(i+1, j));
+  // cout << "width, height: " << to_string(width) << ", " << to_string(height) 
+  //      << endl;
+
+  // skip third line, we just support 255 as max value
+  getline(input, line);
+
+  string image_string;
   while(getline(input, line)){
-    vector<uint8_t> row;
-    current = 0;
-    previous = 0;
-    current = line.find(delim);
-    while(current != string::npos){
-      row.push_back(stoi(line.substr(previous, current-previous)));
+    getline(input, line);
+    image_string += line;
+    // std::cout << "is there a newline character? "
+    //   << to_string(line.find('\n') != string::npos) << endl;
+  }
+
+  vector<vector<uint8_t>> image(height);
+  current = 0;
+  previous = 0;
+  for (size_t i = 0; i < height; i++){
+    // cout << image_string.<< endl;
+    vector<uint8_t> row(width);
+    current = image_string.find(delim);
+    // cout << "index of first space: " << current << endl;
+    for (size_t j = 0; j < width; j++){
+      // cout << "substring: '" << image_string.substr(previous, current-previous) 
+      //      << "'" << endl;
+      // cout << "substring to int: "
+      //      << stoi(image_string.substr(previous, current-previous)) << endl;
+      row[j] = stoi(image_string.substr(previous, current-previous));
       previous = current + 1;
-      current = line.find(delim, previous);
+      current = image_string.find(delim, previous);
     }
-    row.push_back(stoi(line.substr(previous, current-previous)));
-    image.push_back(row);
+    image[i] = row;
   }
 
   input.close();

@@ -16,7 +16,7 @@ Kernel::Kernel(size_t k){
   }
 
   this->k = k;
-  midpoint = size_t(ceil(k/2));
+  midpoint = int(ceil(k/2));
 }
 
 Kernel::~Kernel(){
@@ -24,6 +24,10 @@ Kernel::~Kernel(){
 
 int Kernel::get_midpoint(){
   return midpoint;
+}
+
+size_t Kernel::get_k(){
+  return k;
 }
 
 string Kernel::to_string(){
