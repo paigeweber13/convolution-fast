@@ -62,10 +62,24 @@ int main(int argc, char** argv){
   string usage2 = string(argv[0]) + " input_image_data.csv";
 
   if(argc > 1){
+    cout << "Testing blur kernel on image " << argv[1] << endl;
+
+    cout << "loading image..." << endl;
     auto image = load_image(argv[1]);
+    cout << "finished loading!" << endl;
+    // cout << "image stats:" << endl;
+    // cout << "num rows: " << to_string(image.size()) << endl;
+    // cout << "num cols: " << to_string(image[0].size()) << endl;
+
+    cout << "blurring..." << endl;
     // auto edges = convolve(image, generate_sobel_v_kernel());
-    auto edges = convolve(image, generate_blur_kernel(5));
-    save_image(edges, "output.csv");
+    auto blurred = convolve(image, generate_blur_kernel(5));
+    cout << "finished blurring!" << endl;
+
+    string output_filename = "output.csv";
+    cout << "saving image to " << output_filename << endl;
+    save_image(blurred, output_filename);
+    cout << "finished saving!" << endl;
   } else {
     test_and_output_various_sizes();
   }
