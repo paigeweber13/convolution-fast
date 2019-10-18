@@ -33,7 +33,7 @@ Kernel generate_blur_kernel(size_t k){
   Kernel result(k);
   // will need tuning
   // float std_dev = float(k) * 2/3;
-  float std_dev = 3.0;
+  float std_dev = 5.0;
 
   float sum = 0.0;
   for(int x = -result.get_midpoint(); x <= result.get_midpoint(); x++){
