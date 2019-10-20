@@ -67,9 +67,6 @@ int main(int argc, char** argv){
     cout << "loading image..." << endl;
     auto image = load_image(argv[1]);
     cout << "finished loading!" << endl;
-    // cout << "image stats:" << endl;
-    // cout << "num rows: " << to_string(image.size()) << endl;
-    // cout << "num cols: " << to_string(image[0].size()) << endl;
 
     cout << "blurring..." << endl;
     // auto edges = convolve(image, generate_sobel_v_kernel());
