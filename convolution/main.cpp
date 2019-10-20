@@ -8,8 +8,9 @@
 
 using namespace std;
 
-double time_single_test(vector<vector<uint8_t>> image, unsigned m, unsigned n,
-                        unsigned k){
+double time_single_test(vector<vector<uint8_t>>& image, 
+                        vector<vector<uint8_t>>& output, unsigned m,
+                        unsigned n, unsigned k){
     // generate dummy image of size m, n and kernel of size k. Convolve them
     // and report time.
     // auto image = generate_garbage_image(m, n);
@@ -17,11 +18,11 @@ double time_single_test(vector<vector<uint8_t>> image, unsigned m, unsigned n,
 
     auto start_time = chrono::high_resolution_clock::now();
 
-    auto output = convolve(image, kernel);
+    convolve(image, output, kernel);
 
     auto end_time = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
-    double duration_seconds = duration/10e9;
+    double duration_seconds = duration/1e9;
     return duration_seconds;
 }
 
@@ -39,15 +40,17 @@ void test_and_output_various_sizes(){
 
   // m is length, n is height
   cout << "m,n,k,time (s),gigapixels per second" << endl;
-  // maximum size for all images. Reuse image between tests
 
   for (auto image_size : image_sizes){
     auto m = image_size[0];
     auto n = image_size[1];
+    // reuse images between kernels
     auto image = generate_garbage_image(m, n);
+    auto output = vector<vector<uint8_t>>(image);
     for (auto kernel_size : kernel_sizes){
-      auto single_test_time = time_single_test(image, m,n,kernel_size);
-      auto gigapixels_per_second = single_test_time/(m*n*1e9);
+      auto single_test_time = time_single_test(image, output, m, n,
+                                               kernel_size);
+      auto gigapixels_per_second = m*n/(single_test_time*1e9);
       cout << to_string(m) << "," << to_string(n) << ","
            << to_string(kernel_size) << ","
            << to_string(single_test_time) << ","
@@ -59,18 +62,19 @@ void test_and_output_various_sizes(){
 int main(int argc, char** argv){
   // two possible usages
   string usage1 = string(argv[0]);
-  string usage2 = string(argv[0]) + " input_image_data.csv";
+  string usage2 = string(argv[0]) + " input_image_data.pgm";
 
   if(argc > 1){
     cout << "Testing blur kernel on image " << argv[1] << endl;
 
     cout << "loading image..." << endl;
     auto image = load_image(argv[1]);
+    vector<vector<uint8_t>> blurred(image);
     cout << "finished loading!" << endl;
 
     cout << "blurring..." << endl;
     // auto edges = convolve(image, generate_sobel_v_kernel());
-    auto blurred = convolve(image, generate_blur_kernel(5));
+    convolve(image, blurred, generate_blur_kernel(5));
     cout << "finished blurring!" << endl;
 
     string output_filename = "output.pgm";

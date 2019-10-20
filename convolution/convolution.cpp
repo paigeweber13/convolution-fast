@@ -2,11 +2,10 @@
 
 #include <iostream>
 
-vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel){
+vector<vector<uint8_t>> convolve(vector<vector<uint8_t>>& image, 
+    vector<vector<uint8_t>>& output_image, Kernel kernel){
   auto m = kernel.get_midpoint();
   auto k = kernel.get_k();
-  // create new output image
-  auto output_image = vector<vector<uint8_t>>(image);
 
   #pragma omp parallel
   {
