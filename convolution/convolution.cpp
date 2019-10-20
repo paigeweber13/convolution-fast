@@ -7,7 +7,6 @@ vector<vector<uint8_t>> convolve(vector<vector<uint8_t>> image, Kernel kernel){
   auto k = kernel.get_k();
   // create new output image
   auto output_image = vector<vector<uint8_t>>(image);
-  // std::cout << "num rows: " << to_string(image.size()) << endl;
 
   #pragma omp parallel
   {
@@ -55,8 +54,6 @@ vector<vector<uint8_t>> load_image(string filename){
   size_t width = stoi(line.substr(0, i));
   auto j = line.find(delim);
   size_t height = stoi(line.substr(i+1, j));
-  // cout << "width, height: " << to_string(width) << ", " << to_string(height) 
-  //      << endl;
 
   // skip third line, we just support 255 as max value
   getline(input, line);
@@ -64,23 +61,15 @@ vector<vector<uint8_t>> load_image(string filename){
   string image_string;
   while(getline(input, line)){
     image_string += line;
-    // std::cout << "is there a newline character? "
-    //   << to_string(line.find('\n') != string::npos) << endl;
   }
 
   vector<vector<uint8_t>> image(height);
   current = 0;
   previous = 0;
   for (size_t i = 0; i < height; i++){
-    // cout << image_string.<< endl;
     vector<uint8_t> row(width);
     current = image_string.find(delim, previous);
-    // cout << "index of first space: " << current << endl;
     for (size_t j = 0; j < width; j++){
-      // cout << "substring: '" << image_string.substr(previous, current-previous) 
-      //      << "'" << endl;
-      // cout << "substring to int: "
-      //      << stoi(image_string.substr(previous, current-previous)) << endl;
       row[j] = stoi(image_string.substr(previous, current-previous));
       previous = current + 1;
       current = image_string.find(delim, previous);
