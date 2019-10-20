@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const vector<vector<vector<double>>> kernels({
+const vector<vector<vector<double>>> blur_kernels({
     {},
     {},
     {},
