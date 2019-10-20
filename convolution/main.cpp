@@ -76,7 +76,7 @@ int main(int argc, char** argv){
     auto blurred = convolve(image, generate_blur_kernel(5));
     cout << "finished blurring!" << endl;
 
-    string output_filename = "output.csv";
+    string output_filename = "output.pgm";
     cout << "saving image to " << output_filename << endl;
     save_image(blurred, output_filename);
     cout << "finished saving!" << endl;

@@ -99,13 +99,21 @@ void save_image(vector<vector<uint8_t>> image, string filename){
   output.open(filename);
   string row_output;
 
+  auto width = image[0].size();
+  auto height = image.size();
+
+  // outputing header
+  output << "P2" << endl;
+  output << to_string(width) << " " << to_string(height)
+         << endl;
+  output << "255" << endl;
+
   for(auto row : image){
     row_output = "";
     for(auto pixel : row){
-      row_output += to_string(pixel) + ",";
+      row_output += to_string(pixel) + " ";
     }
-    row_output.back() = '\n';
-    output << row_output;
+    output << row_output << endl;
   }
 
   output.close();
