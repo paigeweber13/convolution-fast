@@ -2,7 +2,15 @@
 
 #include <iostream>
 
-vector<vector<uint8_t>> convolve(vector<vector<uint8_t>>& image, 
+void blur_3x3(vector<vector<uint8_t>>& image, 
+    vector<vector<uint8_t>>& output_image, Kernel kernel){
+}
+
+void blur_convolve(vector<vector<uint8_t>>& image, 
+    vector<vector<uint8_t>>& output_image, size_t k){
+}
+
+void convolve(vector<vector<uint8_t>>& image, 
     vector<vector<uint8_t>>& output_image, Kernel kernel){
   auto m = kernel.get_midpoint();
   auto k = kernel.get_k();
@@ -33,8 +41,6 @@ vector<vector<uint8_t>> convolve(vector<vector<uint8_t>>& image,
       }
     }
   }
-
-  return output_image;
 }
 
 vector<vector<uint8_t>> load_image(string filename){
