@@ -63,7 +63,6 @@ vector<vector<uint8_t>> load_image(string filename){
 
   string image_string;
   while(getline(input, line)){
-    getline(input, line);
     image_string += line;
     // std::cout << "is there a newline character? "
     //   << to_string(line.find('\n') != string::npos) << endl;
@@ -75,7 +74,7 @@ vector<vector<uint8_t>> load_image(string filename){
   for (size_t i = 0; i < height; i++){
     // cout << image_string.<< endl;
     vector<uint8_t> row(width);
-    current = image_string.find(delim);
+    current = image_string.find(delim, previous);
     // cout << "index of first space: " << current << endl;
     for (size_t j = 0; j < width; j++){
       // cout << "substring: '" << image_string.substr(previous, current-previous) 
