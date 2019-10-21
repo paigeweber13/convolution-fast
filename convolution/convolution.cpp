@@ -35,10 +35,10 @@ void convolve(vector<vector<uint8_t>>& image,
     vector<vector<uint8_t>>& output_image, Kernel kernel){
   auto width = image[7].size()-14;
   auto height = image.size()-14;
-  cout << "width, height: " << to_string(width) << ", " << to_string(height)
-       << endl;
-  cout << "vector width, height: " << to_string(image[0].size()) << ", "
-       << to_string(image.size()) << endl;
+  // cout << "width, height: " << to_string(width) << ", " << to_string(height)
+  //      << endl;
+  // cout << "vector width, height: " << to_string(image[0].size()) << ", "
+  //      << to_string(image.size()) << endl;
 
     /* speedup:
         * "#pragma omp for collapse(2)"
@@ -56,9 +56,9 @@ void convolve(vector<vector<uint8_t>>& image,
     #define X_TILE_SIZE 256
     #define Y_TILE_SIZE 64
     // tiles are assigned per processor
-  // #pragma omp parallel
-  // {
-  //   #pragma omp for collapse(2)
+  #pragma omp parallel
+  {
+    #pragma omp for collapse(2)
     for(size_t ymul = 0; ymul < height/Y_TILE_SIZE; ymul++){
       for(size_t xmul = 0; xmul < width/X_TILE_SIZE; xmul++){
         for(size_t j = 0; j < Y_TILE_SIZE; j++){
@@ -69,7 +69,7 @@ void convolve(vector<vector<uint8_t>>& image,
         }
       }
     }
-  // }
+  }
     
     // don't compute edges
     // #pragma omp for
@@ -185,9 +185,9 @@ void save_image(vector<vector<uint8_t>> image, string filename){
 vector<vector<uint8_t>> generate_garbage_image(size_t m, size_t n){
   // give it enough margin on both sides
   vector<vector<uint8_t>> result(n+14);
-  for(size_t i = 0; i < n; i++){
+  for(size_t i = 0; i < n+14; i++){
     result[i] = vector<uint8_t>(m+14);
-    for(size_t j = 0; j < m; j++){
+    for(size_t j = 0; j < m+14; j++){
       result[i][j] = rand() % 256;
     }
   }
