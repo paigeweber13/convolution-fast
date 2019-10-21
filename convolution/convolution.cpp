@@ -11,26 +11,35 @@ void blur_convolve(vector<vector<uint8_t>>& image,
 }
 
 void convolve_single_pixel(vector<vector<uint8_t>>& image, 
-    vector<vector<uint8_t>>& output_image, size_t i, size_t j, Kernel kernel){
+    vector<vector<uint8_t>>& output_image, size_t x, size_t y, Kernel kernel){
   float sum = 0;
+  size_t k = kernel.get_k();
   size_t m = kernel.get_midpoint();
-  for(size_t n = 0; n < kernel.get_k(); n++){
-    for(size_t o = 0; o < m; o++){
-      sum += image[i+n][j+o] * kernel.values[n][o];
+  for(size_t n = 0; n < k; n++){
+    for(size_t o = 0; o < k; o++){
+      // if(x > 2048 || y > 2048){
+      //   cout << "pixel for output: " << to_string(x) << ", " << to_string(y)
+      //        << endl;
+      //   cout << "pixel indices: " << to_string(x-m+n) << ", "
+      //        << to_string(y-m+o) << endl;
+      //   cout << "kernel indices: " << to_string(n) << ", "
+      //        << to_string(o) << endl;
+      // }
+      sum += image[y-m+n][x-m+o] * kernel.values[n][o];
     }
   }
-  output_image[i+m][j+m] = uint8_t(sum);
+  output_image[y][x] = uint8_t(sum);
 }
 
 void convolve(vector<vector<uint8_t>>& image, 
     vector<vector<uint8_t>>& output_image, Kernel kernel){
-  auto m = kernel.get_midpoint();
-  auto k = kernel.get_k();
-  auto width = image[0].size();
-  auto height = image.size();
+  auto width = image[7].size()-14;
+  auto height = image.size()-14;
+  cout << "width, height: " << to_string(width) << ", " << to_string(height)
+       << endl;
+  cout << "vector width, height: " << to_string(image[0].size()) << ", "
+       << to_string(image.size()) << endl;
 
-  #pragma omp parallel
-  {
     /* speedup:
         * "#pragma omp for collapse(2)"
           this linearizes the two for loops - combines these two for lopos
@@ -47,18 +56,20 @@ void convolve(vector<vector<uint8_t>>& image,
     #define X_TILE_SIZE 256
     #define Y_TILE_SIZE 64
     // tiles are assigned per processor
-    #pragma omp for collapse(2)
-    for(size_t ymul = 1; ymul < height/Y_TILE_SIZE; ymul++){
-      for(size_t xmul = 1; xmul < width/X_TILE_SIZE; xmul++){
-        for(size_t i = 0; i < X_TILE_SIZE; i++){
-          for(size_t j = 0; j < Y_TILE_SIZE; j++){
-            convolve_single_pixel(image, output_image, i*xmul+7, j*ymul+7,
-                kernel);
+  // #pragma omp parallel
+  // {
+  //   #pragma omp for collapse(2)
+    for(size_t ymul = 0; ymul < height/Y_TILE_SIZE; ymul++){
+      for(size_t xmul = 0; xmul < width/X_TILE_SIZE; xmul++){
+        for(size_t j = 0; j < Y_TILE_SIZE; j++){
+          for(size_t i = 0; i < X_TILE_SIZE; i++){
+            convolve_single_pixel(image, output_image, xmul*X_TILE_SIZE+i+7,
+                                  ymul*Y_TILE_SIZE+j+7, kernel);
           }
         }
       }
     }
-  }
+  // }
     
     // don't compute edges
     // #pragma omp for
@@ -111,6 +122,25 @@ vector<vector<uint8_t>> load_image(string filename){
   vector<vector<uint8_t>> image(height+14);
   current = 0;
   previous = 0;
+  // initialize borders to 0
+  // top
+  for (size_t i = 0; i < 7; i++){
+    image[i] = vector<uint8_t>(width+14);
+  }
+  // bottom
+  for (size_t i = image.size()-1; i >= image.size()-7; i--){
+    image[i] = vector<uint8_t>(width+14);
+  }
+  // left, right
+  // for (size_t i = 0; i < image.size(); i++){
+  //   for (size_t j = 0; j < 7; j++){
+  //     image[i][j] = 0;
+  //   }
+  //   for (size_t j = width; j > width+7; j--){
+  //     image[i][j] = 0;
+  //   }
+  // }
+
   for (size_t i = 7; i < height+7; i++){
     vector<uint8_t> row(width+14);
     for (size_t j = 7; j < width+7; j++){
