@@ -12,21 +12,15 @@ void blur_convolve(vector<vector<uint8_t>>& image,
 
 void convolve_single_pixel(vector<vector<uint8_t>>& image, 
     vector<vector<uint8_t>>& output_image, size_t x, size_t y, Kernel kernel){
-  float sum = 0;
-  size_t k = kernel.get_k();
-  size_t m = kernel.get_midpoint();
-  for(size_t n = 0; n < k; n++){
-    for(size_t o = 0; o < k; o++){
-      sum += image[y-m+n][x-m+o] * kernel.values[n][o];
-    }
-  }
-  output_image[y][x] = uint8_t(sum);
 }
 
 void convolve(vector<vector<uint8_t>>& image, 
     vector<vector<uint8_t>>& output_image, Kernel kernel){
   auto width = image[7].size()-14;
   auto height = image.size()-14;
+  float sum = 0;
+  size_t k = kernel.get_k();
+  size_t m = kernel.get_midpoint();
 
     /* speedup:
         * "#pragma omp for collapse(2)"
@@ -48,11 +42,18 @@ void convolve(vector<vector<uint8_t>>& image,
   {
     #pragma omp for collapse(2)
     for(size_t ymul = 0; ymul < height/Y_TILE_SIZE; ymul++){
-      for(size_t j = 0; j < Y_TILE_SIZE; j++){
-        for(size_t xmul = 0; xmul < width/X_TILE_SIZE; xmul++){
+      for(size_t xmul = 0; xmul < width/X_TILE_SIZE; xmul++){
+        for(size_t j = 0; j < Y_TILE_SIZE; j++){
           for(size_t i = 0; i < X_TILE_SIZE; i++){
-            convolve_single_pixel(image, output_image, xmul*X_TILE_SIZE+i+7,
-                                  ymul*Y_TILE_SIZE+j+7, kernel);
+            sum = 0;
+            for(size_t n = 0; n < k; n++){
+              for(size_t o = 0; o < k; o++){
+                sum +=
+                  image[ymul*Y_TILE_SIZE+7+j-m+n][xmul*X_TILE_SIZE+7+i-m+o]
+                  * kernel.values[n][o];
+              }
+            }
+            output_image[j][i] = uint8_t(sum);
           }
         }
       }
