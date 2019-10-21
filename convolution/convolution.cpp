@@ -41,21 +41,15 @@ void convolve(vector<vector<uint8_t>>& image,
   #pragma omp parallel
   {
     #pragma omp for collapse(2)
-    for(size_t ymul = 0; ymul < height/Y_TILE_SIZE; ymul++){
-      for(size_t xmul = 0; xmul < width/X_TILE_SIZE; xmul++){
-        for(size_t j = 0; j < Y_TILE_SIZE; j++){
-          for(size_t i = 0; i < X_TILE_SIZE; i++){
-            sum = 0;
-            for(size_t n = 0; n < k; n++){
-              for(size_t o = 0; o < k; o++){
-                sum +=
-                  image[ymul*Y_TILE_SIZE+7+j-m+n][xmul*X_TILE_SIZE+7+i-m+o]
-                  * kernel.values[n][o];
-              }
-            }
-            output_image[j][i] = uint8_t(sum);
+    for(size_t y = 7; y < height+7; y++){
+      for(size_t x = 7; x < width+7; x++){
+        sum = 0;
+        for(size_t n = 0; n < k; n++){
+          for(size_t o = 0; o < k; o++){
+            sum += image[y-m+o][x-m+n] * kernel.values[n][o];
           }
         }
+        output_image[y][x] = uint8_t(sum);
       }
     }
   }
