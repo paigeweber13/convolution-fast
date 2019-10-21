@@ -17,14 +17,6 @@ void convolve_single_pixel(vector<vector<uint8_t>>& image,
   size_t m = kernel.get_midpoint();
   for(size_t n = 0; n < k; n++){
     for(size_t o = 0; o < k; o++){
-      // if(x > 2048 || y > 2048){
-      //   cout << "pixel for output: " << to_string(x) << ", " << to_string(y)
-      //        << endl;
-      //   cout << "pixel indices: " << to_string(x-m+n) << ", "
-      //        << to_string(y-m+o) << endl;
-      //   cout << "kernel indices: " << to_string(n) << ", "
-      //        << to_string(o) << endl;
-      // }
       sum += image[y-m+n][x-m+o] * kernel.values[n][o];
     }
   }
@@ -35,10 +27,6 @@ void convolve(vector<vector<uint8_t>>& image,
     vector<vector<uint8_t>>& output_image, Kernel kernel){
   auto width = image[7].size()-14;
   auto height = image.size()-14;
-  // cout << "width, height: " << to_string(width) << ", " << to_string(height)
-  //      << endl;
-  // cout << "vector width, height: " << to_string(image[0].size()) << ", "
-  //      << to_string(image.size()) << endl;
 
     /* speedup:
         * "#pragma omp for collapse(2)"
@@ -60,8 +48,8 @@ void convolve(vector<vector<uint8_t>>& image,
   {
     #pragma omp for collapse(2)
     for(size_t ymul = 0; ymul < height/Y_TILE_SIZE; ymul++){
-      for(size_t xmul = 0; xmul < width/X_TILE_SIZE; xmul++){
-        for(size_t j = 0; j < Y_TILE_SIZE; j++){
+      for(size_t j = 0; j < Y_TILE_SIZE; j++){
+        for(size_t xmul = 0; xmul < width/X_TILE_SIZE; xmul++){
           for(size_t i = 0; i < X_TILE_SIZE; i++){
             convolve_single_pixel(image, output_image, xmul*X_TILE_SIZE+i+7,
                                   ymul*Y_TILE_SIZE+j+7, kernel);
@@ -70,28 +58,6 @@ void convolve(vector<vector<uint8_t>>& image,
       }
     }
   }
-    
-    // don't compute edges
-    // #pragma omp for
-  //   for(size_t i = 0; i < (height - 2*m); i++){
-  //     // cout << "we are on row: " << to_string(i) << endl;
-  //     // for each row
-  //     for(size_t j = 0; j < (width - 2*m); j++){
-  //       // for each pixel in that row
-  //       float sum = 0;
-  //       for(size_t n = 0; n < k; n++){
-  //         for(size_t o = 0; o < k; o++){
-  //           sum += image[i+n][j+o] * kernel.values[n][o];
-  //         }
-  //       }
-  //       // overflow is not possible because of nature of gaussian blur
-  //   
-      // cout << "current pixel: " << to_stm] = uint8_t(sum);
-  //   
-      // cout << "current pixel: " << to_st
-  //   
-      // cout << "current pixel: " << to_st
-  // }
 }
 
 vector<vector<uint8_t>> load_image(string filename){
@@ -131,15 +97,6 @@ vector<vector<uint8_t>> load_image(string filename){
   for (size_t i = image.size()-1; i >= image.size()-7; i--){
     image[i] = vector<uint8_t>(width+14);
   }
-  // left, right
-  // for (size_t i = 0; i < image.size(); i++){
-  //   for (size_t j = 0; j < 7; j++){
-  //     image[i][j] = 0;
-  //   }
-  //   for (size_t j = width; j > width+7; j--){
-  //     image[i][j] = 0;
-  //   }
-  // }
 
   for (size_t i = 7; i < height+7; i++){
     vector<uint8_t> row(width+14);
