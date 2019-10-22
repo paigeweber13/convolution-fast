@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <cstdint>
 #include <fstream>
+#include <immintrin.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -14,6 +16,8 @@
 
 using namespace std;
 
+void blur_convolve(vector<vector<uint8_t>>& image, 
+    vector<vector<uint8_t>>& output_image, size_t k);
 void convolve(vector<vector<uint8_t>>& image, 
     vector<vector<uint8_t>>& output_image, Kernel kernel);
 vector<vector<uint8_t>> load_image(string filename);

@@ -14,11 +14,11 @@ double time_single_test(vector<vector<uint8_t>>& image,
     // generate dummy image of size m, n and kernel of size k. Convolve them
     // and report time.
     // auto image = generate_garbage_image(m, n);
-    auto kernel = generate_blur_kernel(k);
+    // auto kernel = generate_blur_kernel(k);
 
     auto start_time = chrono::high_resolution_clock::now();
 
-    convolve(image, output, kernel);
+    blur_convolve(image, output, k);
 
     auto end_time = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();

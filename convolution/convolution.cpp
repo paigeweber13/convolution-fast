@@ -3,15 +3,89 @@
 #include <iostream>
 
 void blur_3x3(vector<vector<uint8_t>>& image, 
-    vector<vector<uint8_t>>& output_image, Kernel kernel){
+    vector<vector<uint8_t>>& output_image){
+  auto width = image[7].size()-14;
+  auto height = image.size()-14;
+  #pragma omp parallel
+  {
+    #pragma omp for collapse(2)
+    for(size_t y = 7; y < height+7; y++){
+      for(size_t x = 7; x < width+7; x++){
+        ;
+      }
+    }
+  }
+}
+
+void blur_5x5(vector<vector<uint8_t>>& image, 
+    vector<vector<uint8_t>>& output_image){
+  auto width = image[7].size()-14;
+  auto height = image.size()-14;
+  #pragma omp parallel
+  {
+    #pragma omp for collapse(2)
+    for(size_t y = 7; y < height+7; y++){
+      for(size_t x = 7; x < width+7; x++){
+        float sum = 0;
+        sum += image[y-2][x-2] * blur_kernels[5][0][0];
+        sum += image[y-2][x-1] * blur_kernels[5][0][1];
+        sum += image[y-2][x  ] * blur_kernels[5][0][2];
+        sum += image[y-2][x+1] * blur_kernels[5][0][3];
+        sum += image[y-2][x+2] * blur_kernels[5][0][4];
+
+        sum += image[y-1][x-2] * blur_kernels[5][1][0];
+        sum += image[y-1][x-1] * blur_kernels[5][1][1];
+        sum += image[y-1][x  ] * blur_kernels[5][1][2];
+        sum += image[y-1][x+1] * blur_kernels[5][1][3];
+        sum += image[y-1][x+2] * blur_kernels[5][1][4];
+
+        sum += image[y  ][x-2] * blur_kernels[5][2][0];
+        sum += image[y  ][x-1] * blur_kernels[5][2][1];
+        sum += image[y  ][x  ] * blur_kernels[5][2][2];
+        sum += image[y  ][x+1] * blur_kernels[5][2][3];
+        sum += image[y  ][x+2] * blur_kernels[5][2][4];
+
+        sum += image[y+1][x-2] * blur_kernels[5][3][0];
+        sum += image[y+1][x-1] * blur_kernels[5][3][1];
+        sum += image[y+1][x  ] * blur_kernels[5][3][2];
+        sum += image[y+1][x+1] * blur_kernels[5][3][3];
+        sum += image[y+1][x+2] * blur_kernels[5][3][4];
+
+        sum += image[y+2][x-2] * blur_kernels[5][4][0];
+        sum += image[y+2][x-1] * blur_kernels[5][4][1];
+        sum += image[y+2][x  ] * blur_kernels[5][4][2];
+        sum += image[y+2][x+1] * blur_kernels[5][4][3];
+        sum += image[y+2][x+2] * blur_kernels[5][4][4];
+        output_image[y][x] = uint8_t(sum);
+      }
+    }
+  }
 }
 
 void blur_convolve(vector<vector<uint8_t>>& image, 
     vector<vector<uint8_t>>& output_image, size_t k){
-}
-
-void convolve_single_pixel(vector<vector<uint8_t>>& image, 
-    vector<vector<uint8_t>>& output_image, size_t x, size_t y, Kernel kernel){
+  switch(k) {
+    case 3:
+      blur_3x3(image, output_image);
+      break;
+    case 5:
+      blur_5x5(image, output_image);
+      break;
+    case 7:
+      break;
+    case 9:
+      break;
+    case 11:
+      break;
+    case 13:
+      break;
+    case 15:
+      break;
+    default:
+      throw runtime_error(
+        "k must be an odd number between 3 and 15, inclusive");
+      break;
+  }
 }
 
 void convolve(vector<vector<uint8_t>>& image, 
