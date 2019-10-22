@@ -72,12 +72,16 @@ int main(int argc, char** argv){
 
     cout << "loading image..." << endl;
     auto image = load_image(argv[1]);
-    vector<vector<uint8_t>> blurred(image);
+    // creating output for blurred
+    auto blurred = load_image(argv[1]);
+    // vector<vector<float, aligned_allocator<float>>,
+    //   aligned_allocator<vector<float>>> blurred();
+    // copy(image.begin(), image.end(), back_inserter(blurred))
     cout << "finished loading!" << endl;
 
     cout << "blurring..." << endl;
     // auto edges = convolve(image, generate_sobel_v_kernel());
-    convolve(image, blurred, generate_blur_kernel(5));
+    blur_convolve(image, blurred, 5);
     cout << "finished blurring!" << endl;
 
     string output_filename = "output.pgm";
