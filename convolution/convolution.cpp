@@ -29,13 +29,15 @@ void blur_5x5(
   auto height = image.size()-BORDER_SIZE*2;
 
   // this code below shows that the memory is sequentially allocated, row-major
-  // cout << "memory addresses of 5x5 kernel" << endl;
-  // for(size_t i = 0; i < 5; i++){
-  //   for(size_t j = 0; j < 5; j++){
-  //     cout << to_string(i) << ", " << to_string(j) << ": "
-  //          << &blur_kernels[5][i][j] << endl;
-  //   }
-  // }
+  cout << "5x5 kernel info" << endl;
+  cout << "i, j: value  - memaddress" << endl;
+  for(size_t i = 0; i < 5; i++){
+    for(size_t j = 0; j < 8; j++){
+      cout << to_string(i) << ", " << to_string(j) << ": "
+           << blur_kernels[5][i][j] << " - " << &blur_kernels[5][i][j] << endl;
+    }
+    cout << endl;
+  }
 
   // however, since the images are huge, a 5x5 part of an image is NOT
   // sequentially allocated. We have to load from a few places in memory...
@@ -48,21 +50,37 @@ void blur_5x5(
   //   cout << endl;
   // }
 
-  #pragma omp parallel
-  {
+  // #pragma omp parallel
+  // {
     // load kernel
     // last three elements in each vector will be garbage, unfortunately
     auto kernel_row_1 = _mm256_load_ps(&blur_kernels[5][0][0]);
-    auto kernel_row_2 = _mm256_load_ps(&blur_kernels[5][1][0]);
+    cout << "finished loading row 1!\n";
+    cout << "address of row 1: " << &blur_kernels[5][0][0] << endl;
+    cout << "address of row 1 mod 32: "
+         << reinterpret_cast<intptr_t>(&blur_kernels[5][0][0]) % 32 << endl;
     auto kernel_row_3 = _mm256_load_ps(&blur_kernels[5][2][0]);
-    auto kernel_row_4 = _mm256_load_ps(&blur_kernels[5][3][0]);
+    cout << "finished loading row 3!\n";
     auto kernel_row_5 = _mm256_load_ps(&blur_kernels[5][4][0]);
+    cout << "finished loading row 5!\n";
+
+    // even numbers don't work for some reason
+    cout << "trying row 2...\n";
+    cout << "address of row 2: " << &blur_kernels[5][1][0] << endl;
+    cout << "address of row 2 mod 32: "
+         << reinterpret_cast<intptr_t>(&blur_kernels[5][1][0]) % 32 << endl;
+    auto kernel_row_2 = _mm256_load_ps(&blur_kernels[5][1][0]);
+    cout << "finished loading row 2!\n";
+    auto kernel_row_4 = _mm256_load_ps(&blur_kernels[5][3][0]);
+    cout << "finished loading row 4!\n";
 
     // place to store results for horizontal add
     vector<float, aligned_allocator<float>> final_vector(8);
 
-    #pragma omp for collapse(2)
+    // #pragma omp for collapse(2)
+    #pragma omp for
     for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y += 5){
+      cout << "row number: " + to_string(y) + "\n";
       for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x += 5){
         auto image_row_1 = _mm256_load_ps(&image[y  ][x]);
         auto image_row_2 = _mm256_load_ps(&image[y+1][x]);
@@ -77,6 +95,8 @@ void blur_5x5(
         auto d = _mm256_fmadd_ps (kernel_row_4, image_row_4, c);
         auto e = _mm256_fmadd_ps (kernel_row_5, image_row_5, d);
 
+        // replace the rest of the contents of this loop with hadd because
+        // we'll padd the remaining parts of kenerl with zeroes
         _mm256_store_ps(&final_vector[0], e);
 
         output[y][x] = uint8_t(
@@ -85,7 +105,7 @@ void blur_5x5(
         );
       }
     }
-  }
+  // }
 }
 
 void blur_convolve(
@@ -159,7 +179,8 @@ void convolve(vector<vector<uint8_t>>& image,
   }
 }
 
-vector<vector<uint8_t>> load_image(string filename){
+vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>> load_image(string filename){
   ifstream input;
   input.open(filename);
   string line;
@@ -184,21 +205,22 @@ vector<vector<uint8_t>> load_image(string filename){
     image_string += line;
   }
 
-  vector<vector<uint8_t>> image(height+BORDER_SIZE*2);
+  vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>> image(height+BORDER_SIZE*2);
   current = 0;
   previous = 0;
   // initialize borders to 0
   // top
   for (size_t i = 0; i < BORDER_SIZE; i++){
-    image[i] = vector<uint8_t>(width+BORDER_SIZE*2);
+    image[i] = vector<float, aligned_allocator<float>>(width+BORDER_SIZE*2);
   }
   // bottom
   for (size_t i = image.size()-1; i >= image.size()-BORDER_SIZE; i--){
-    image[i] = vector<uint8_t>(width+BORDER_SIZE*2);
+    image[i] = vector<float, aligned_allocator<float>>(width+BORDER_SIZE*2);
   }
 
   for (size_t i = BORDER_SIZE; i < height+BORDER_SIZE; i++){
-    vector<uint8_t> row(width+BORDER_SIZE*2);
+    vector<float, aligned_allocator<float>> row(width+BORDER_SIZE*2);
     for (size_t j = BORDER_SIZE; j < width+BORDER_SIZE; j++){
       current = image_string.find(delim, previous);
       row[j] = stoi(image_string.substr(previous, current-previous));
@@ -212,7 +234,8 @@ vector<vector<uint8_t>> load_image(string filename){
   return image;
 }
 
-void save_image(vector<vector<uint8_t>> image, string filename){
+void save_image(vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>> image, string filename){
   ofstream output;
   output.open(filename);
   string row_output;
@@ -229,7 +252,7 @@ void save_image(vector<vector<uint8_t>> image, string filename){
   for(size_t i = BORDER_SIZE; i < height-BORDER_SIZE; i++){
     row_output = "";
     for(size_t j = BORDER_SIZE; j < width-BORDER_SIZE; j++){
-      row_output += to_string(image[i][j]) + " ";
+      row_output += to_string(uint8_t(image[i][j])) + " ";
     }
     output << row_output << endl;
   }

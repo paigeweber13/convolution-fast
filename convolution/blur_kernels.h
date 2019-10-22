@@ -6,13 +6,8 @@
 using namespace std;
 
 const vector<
-        vector<
-            vector<
-                float, boost::alignment::aligned_allocator<float>
-            >,
-            boost::alignment::aligned_allocator<vector<float>>
-        >,
-      boost::alignment::aligned_allocator<vector<vector<float>>>
+        vector<vector<float>>,
+        boost::alignment::aligned_allocator<vector<vector<float>>>
       > blur_kernels({
     {},
     {},
@@ -27,12 +22,13 @@ const vector<
     // k = 5
 
     {
-        {0.0232, 0.0338, 0.0383, 0.0338, 0.0232},
-        {0.0338, 0.0492, 0.0558, 0.0492, 0.0338},
-        {0.0383, 0.0558, 0.0632, 0.0558, 0.0383},
-        {0.0338, 0.0492, 0.0558, 0.0492, 0.0338},
-        {0.0232, 0.0338, 0.0383, 0.0338, 0.0232},
-
+        // extra 3 values are because loading vectors will load 8 things at a 
+        // time. This is garbage data that won't be used.
+        {0.0232, 0.0338, 0.0383, 0.0338, 0.0232, 0, 0, 0},
+        {0.0338, 0.0492, 0.0558, 0.0492, 0.0338, 0, 0, 0},
+        {0.0383, 0.0558, 0.0632, 0.0558, 0.0383, 0, 0, 0},
+        {0.0338, 0.0492, 0.0558, 0.0492, 0.0338, 0, 0, 0},
+        {0.0232, 0.0338, 0.0383, 0.0338, 0.0232, 0, 0, 0},
     },
     {},
     // k = 7
