@@ -17,6 +17,15 @@ no returns, added to output param:
 8192,8192,11,0.866832,0.077419
 8192,8192,13,1.217025,0.055142
 8192,8192,15,1.623677,0.041331
+# convolution/convolution.cpp:34:             sum += image[i+n][j+o] * kernel.values[n][o];
+	.loc 2 34 0 discriminator 2
+	movzbl	(%rcx,%rax), %edx	# MEM[base: _100, index: o_108, offset: 0], MEM[base: _100, index: o_108, offset: 0]
+	vxorps	%xmm0, %xmm0, %xmm0	# tmp256
+	vcvtsi2ss	%edx, %xmm0, %xmm0	# MEM[base: _100, index: o_108, offset: 0], tmp256, tmp256
+	vfmadd231ss	(%rsi,%rax,4), %xmm0, %xmm1	# MEM[base: _73, index: o_108, step: 4, offset: 0], tmp256, sum
+	
+
+even basic code seems to use vector operations and I don't understand why it's so slow
 
 changed to tile image: (slower!!!)
 8192,8192,3,0.699037,0.096002
