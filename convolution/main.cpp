@@ -8,9 +8,12 @@
 
 using namespace std;
 
-double time_single_test(vector<vector<uint8_t>>& image, 
-                        vector<vector<uint8_t>>& output, unsigned m,
-                        unsigned n, unsigned k){
+double time_single_test(
+  vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>>& image, 
+  vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>>& output, 
+  unsigned m, unsigned n, unsigned k){
     // generate dummy image of size m, n and kernel of size k. Convolve them
     // and report time.
     // auto image = generate_garbage_image(m, n);
@@ -46,7 +49,7 @@ void test_and_output_various_sizes(){
     auto n = image_size[1];
     // reuse images between kernels
     auto image = generate_garbage_image(m, n);
-    auto output = vector<vector<uint8_t>>(image);
+    auto output = generate_garbage_image(m, n);
     for (auto kernel_size : kernel_sizes){
       auto single_test_time = time_single_test(image, output, m, n,
                                                kernel_size);

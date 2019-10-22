@@ -2,8 +2,11 @@
 
 #include <iostream>
 
-void blur_3x3(vector<vector<uint8_t>>& image, 
-    vector<vector<uint8_t>>& output_image){
+void blur_3x3(
+  vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>>& image, 
+  vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>>& output){
   auto width = image[7].size()-14;
   auto height = image.size()-14;
   #pragma omp parallel
@@ -17,12 +20,18 @@ void blur_3x3(vector<vector<uint8_t>>& image,
   }
 }
 
-void blur_5x5(vector<vector<uint8_t>>& image, 
-    vector<vector<uint8_t>>& output_image){
+void blur_5x5(
+  vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>>& image, 
+  vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>>& output){
   auto width = image[7].size()-14;
   auto height = image.size()-14;
+
   #pragma omp parallel
   {
+    // load kernel
+    // __mm256_load_ps
     #pragma omp for collapse(2)
     for(size_t y = 7; y < height+7; y++){
       for(size_t x = 7; x < width+7; x++){
@@ -36,6 +45,8 @@ void blur_5x5(vector<vector<uint8_t>>& image,
         sum += image[y-1][x-2] * blur_kernels[5][1][0];
         sum += image[y-1][x-1] * blur_kernels[5][1][1];
         sum += image[y-1][x  ] * blur_kernels[5][1][2];
+
+        // ---
         sum += image[y-1][x+1] * blur_kernels[5][1][3];
         sum += image[y-1][x+2] * blur_kernels[5][1][4];
 
@@ -46,6 +57,8 @@ void blur_5x5(vector<vector<uint8_t>>& image,
         sum += image[y  ][x+2] * blur_kernels[5][2][4];
 
         sum += image[y+1][x-2] * blur_kernels[5][3][0];
+        
+        // --
         sum += image[y+1][x-1] * blur_kernels[5][3][1];
         sum += image[y+1][x  ] * blur_kernels[5][3][2];
         sum += image[y+1][x+1] * blur_kernels[5][3][3];
@@ -55,21 +68,27 @@ void blur_5x5(vector<vector<uint8_t>>& image,
         sum += image[y+2][x-1] * blur_kernels[5][4][1];
         sum += image[y+2][x  ] * blur_kernels[5][4][2];
         sum += image[y+2][x+1] * blur_kernels[5][4][3];
+
+        // --
         sum += image[y+2][x+2] * blur_kernels[5][4][4];
-        output_image[y][x] = uint8_t(sum);
+        output[y][x] = uint8_t(sum);
       }
     }
   }
 }
 
-void blur_convolve(vector<vector<uint8_t>>& image, 
-    vector<vector<uint8_t>>& output_image, size_t k){
+void blur_convolve(
+  vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>>& image, 
+  vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>>& output, 
+  size_t k){
   switch(k) {
     case 3:
-      blur_3x3(image, output_image);
+      blur_3x3(image, output);
       break;
     case 5:
-      blur_5x5(image, output_image);
+      blur_5x5(image, output);
       break;
     case 7:
       break;
@@ -208,11 +227,17 @@ void save_image(vector<vector<uint8_t>> image, string filename){
 }
 
 // m is length, n is height
-vector<vector<uint8_t>> generate_garbage_image(size_t m, size_t n){
+vector<vector<float, aligned_allocator<float>>,
+    aligned_allocator<vector<float>>> 
+generate_garbage_image(size_t m, size_t n){
   // give it enough margin on both sides
-  vector<vector<uint8_t>> result(n+14);
+  vector<
+      vector<float, aligned_allocator<float>>,
+      aligned_allocator<vector<float>>
+    > result(n+14);
   for(size_t i = 0; i < n+14; i++){
-    result[i] = vector<uint8_t>(m+14);
+    result[i] = vector<float, boost::alignment::aligned_allocator<float>>(
+                  m+14);
     for(size_t j = 0; j < m+14; j++){
       result[i][j] = rand() % 256;
     }

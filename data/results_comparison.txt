@@ -64,3 +64,10 @@ Assembly for the part that actually does the work:
 	vxorpd	%xmm2, %xmm2, %xmm2	# tmp480
 	divq	%r14	# width
 	movq	%rbx, (%rsp)	# _1491, %sf
+
+aligned alloc:
+8192,8192,5,0.126838,0.529091
+(DOUBLE performance zomg)
+
+hand-written intrinsics:
+

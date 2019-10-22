@@ -1,10 +1,19 @@
 #pragma once
 
+#include <boost/align/aligned_allocator.hpp>
 #include <vector>
 
 using namespace std;
 
-const vector<vector<vector<double>>> blur_kernels({
+const vector<
+        vector<
+            vector<
+                float, boost::alignment::aligned_allocator<float>
+            >,
+            boost::alignment::aligned_allocator<vector<float>>
+        >,
+      boost::alignment::aligned_allocator<vector<vector<float>>>
+      > blur_kernels({
     {},
     {},
     {},
