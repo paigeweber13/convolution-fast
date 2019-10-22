@@ -16,7 +16,7 @@
 
 // size of margin/padding/border/whatever-you-call-it on each side of actual 
 // image
-#define BORDER_SIZE 14
+#define BORDER_SIZE 7
 
 using namespace std;
 using namespace boost::alignment;
