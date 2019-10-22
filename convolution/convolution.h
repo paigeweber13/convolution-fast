@@ -14,6 +14,8 @@
 #include "kernel.h"
 #include "generate_kernels.h"
 
+#define BORDER_SIZE 7
+
 using namespace std;
 using namespace boost::alignment;
 

@@ -7,13 +7,13 @@ void blur_3x3(
     aligned_allocator<vector<float>>>& image, 
   vector<vector<float, aligned_allocator<float>>,
     aligned_allocator<vector<float>>>& output){
-  auto width = image[7].size()-14;
-  auto height = image.size()-14;
+  auto width = image[BORDER_SIZE].size()-BORDER_SIZE*2;
+  auto height = image.size()-BORDER_SIZE*2;
   #pragma omp parallel
   {
     #pragma omp for collapse(2)
-    for(size_t y = 7; y < height+7; y++){
-      for(size_t x = 7; x < width+7; x++){
+    for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y++){
+      for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x++){
         ;
       }
     }
@@ -25,8 +25,8 @@ void blur_5x5(
     aligned_allocator<vector<float>>>& image, 
   vector<vector<float, aligned_allocator<float>>,
     aligned_allocator<vector<float>>>& output){
-  auto width = image[7].size()-14;
-  auto height = image.size()-14;
+  auto width = image[BORDER_SIZE].size()-BORDER_SIZE*2;
+  auto height = image.size()-BORDER_SIZE*2;
 
   // this code below shows that the memory is sequentially allocated, row-major
   // cout << "memory addresses of 5x5 kernel" << endl;
@@ -62,9 +62,8 @@ void blur_5x5(
     vector<float, aligned_allocator<float>> final_vector(8);
 
     #pragma omp for collapse(2)
-    // we'll have to increase the size of the borders...
-    for(size_t y = 7; y < height+7; y += 5){
-      for(size_t x = 7; x < width+7; x += 5){
+    for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y += 5){
+      for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x += 5){
         auto image_row_1 = _mm256_load_ps(&image[y  ][x]);
         auto image_row_2 = _mm256_load_ps(&image[y+1][x]);
         auto image_row_3 = _mm256_load_ps(&image[y+2][x]);
@@ -121,8 +120,8 @@ void blur_convolve(
 
 void convolve(vector<vector<uint8_t>>& image, 
     vector<vector<uint8_t>>& output_image, Kernel kernel){
-  auto width = image[7].size()-14;
-  auto height = image.size()-14;
+  auto width = image[BORDER_SIZE].size()-BORDER_SIZE*2;
+  auto height = image.size()-BORDER_SIZE*2;
   float sum = 0;
   size_t k = kernel.get_k();
   size_t m = kernel.get_midpoint();
@@ -146,8 +145,8 @@ void convolve(vector<vector<uint8_t>>& image,
   #pragma omp parallel
   {
     #pragma omp for collapse(2)
-    for(size_t y = 7; y < height+7; y++){
-      for(size_t x = 7; x < width+7; x++){
+    for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y++){
+      for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x++){
         sum = 0;
         for(size_t n = 0; n < k; n++){
           for(size_t o = 0; o < k; o++){
@@ -185,22 +184,22 @@ vector<vector<uint8_t>> load_image(string filename){
     image_string += line;
   }
 
-  vector<vector<uint8_t>> image(height+14);
+  vector<vector<uint8_t>> image(height+BORDER_SIZE*2);
   current = 0;
   previous = 0;
   // initialize borders to 0
   // top
-  for (size_t i = 0; i < 7; i++){
-    image[i] = vector<uint8_t>(width+14);
+  for (size_t i = 0; i < BORDER_SIZE; i++){
+    image[i] = vector<uint8_t>(width+BORDER_SIZE*2);
   }
   // bottom
-  for (size_t i = image.size()-1; i >= image.size()-7; i--){
-    image[i] = vector<uint8_t>(width+14);
+  for (size_t i = image.size()-1; i >= image.size()-BORDER_SIZE; i--){
+    image[i] = vector<uint8_t>(width+BORDER_SIZE*2);
   }
 
-  for (size_t i = 7; i < height+7; i++){
-    vector<uint8_t> row(width+14);
-    for (size_t j = 7; j < width+7; j++){
+  for (size_t i = BORDER_SIZE; i < height+BORDER_SIZE; i++){
+    vector<uint8_t> row(width+BORDER_SIZE*2);
+    for (size_t j = BORDER_SIZE; j < width+BORDER_SIZE; j++){
       current = image_string.find(delim, previous);
       row[j] = stoi(image_string.substr(previous, current-previous));
       previous = current + 1;
@@ -218,18 +217,18 @@ void save_image(vector<vector<uint8_t>> image, string filename){
   output.open(filename);
   string row_output;
 
-  auto width = image[7].size();
+  auto width = image[BORDER_SIZE].size();
   auto height = image.size();
 
   // outputing header
   output << "P2" << endl;
-  output << to_string(width-14) << " " << to_string(height-14)
-         << endl;
+  output << to_string(width-BORDER_SIZE*2) << " "
+         << to_string(height-BORDER_SIZE*2) << endl;
   output << "255" << endl;
 
-  for(size_t i = 7; i < height-7; i++){
+  for(size_t i = BORDER_SIZE; i < height-BORDER_SIZE; i++){
     row_output = "";
-    for(size_t j = 7; j < width-7; j++){
+    for(size_t j = BORDER_SIZE; j < width-BORDER_SIZE; j++){
       row_output += to_string(image[i][j]) + " ";
     }
     output << row_output << endl;
@@ -246,11 +245,11 @@ generate_garbage_image(size_t m, size_t n){
   vector<
       vector<float, aligned_allocator<float>>,
       aligned_allocator<vector<float>>
-    > result(n+14);
-  for(size_t i = 0; i < n+14; i++){
+    > result(n+BORDER_SIZE*2);
+  for(size_t i = 0; i < n+BORDER_SIZE*2; i++){
     result[i] = vector<float, boost::alignment::aligned_allocator<float>>(
-                  m+14);
-    for(size_t j = 0; j < m+14; j++){
+                  m+BORDER_SIZE*2);
+    for(size_t j = 0; j < m+BORDER_SIZE*2; j++){
       result[i][j] = rand() % 256;
     }
   }
