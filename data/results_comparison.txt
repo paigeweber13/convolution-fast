@@ -44,3 +44,14 @@ with only "#pragma omp for"
 8192,8192,11,1.051807,0.063803
 8192,8192,13,1.462699,0.045880
 8192,8192,15,1.827963,0.036712
+
+with innermost 2 for loops unrolled
+8192,8192,5,0.286360,0.234351
+(slightly SLOWER)
+Assembly for the part that actually does the work:
+# convolution/convolution.cpp:30:         sum += image[y-2][x-2] * blur_kernels[5][0][0];
+	.loc 2 30 0
+	movq	0(%rbp), %r15	# *.omp_data_i_9(D).image, _31
+	vxorpd	%xmm2, %xmm2, %xmm2	# tmp480
+	divq	%r14	# width
+	movq	%rbx, (%rsp)	# _1491, %sf
