@@ -22,21 +22,19 @@ using namespace std;
 using namespace boost::alignment;
 
 void blur_convolve(
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& image, 
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& output, 
+  vector<vector<float, aligned_allocator<float, 32> >>& image, 
+  vector<vector<float, aligned_allocator<float, 32> >>& output, 
     size_t k);
 
 void convolve(vector<vector<uint8_t>>& image, 
     vector<vector<uint8_t>>& output_image, Kernel kernel);
 
-vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>> load_image(string filename);
+vector<vector<float, aligned_allocator<float, 32> >>
+    load_image(string filename);
 
-void save_image(vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>> image, string filename);
+void save_image(
+    vector<vector<float, aligned_allocator<float, 32> >> image,
+    string filename);
 
-vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>> 
-generate_garbage_image(size_t m, size_t n);
+vector<vector<float, aligned_allocator<float, 32> >> 
+    generate_garbage_image(size_t m, size_t n);

@@ -3,10 +3,8 @@
 #include <iostream>
 
 void blur_3x3(
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& image, 
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& output){
+  vector<vector<float, aligned_allocator<float, 32> >>& image, 
+  vector<vector<float, aligned_allocator<float, 32> >>& output){
   auto width = image[BORDER_SIZE].size()-BORDER_SIZE*2;
   auto height = image.size()-BORDER_SIZE*2;
   #pragma omp parallel
@@ -21,10 +19,8 @@ void blur_3x3(
 }
 
 void blur_5x5(
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& image, 
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& output){
+  vector<vector<float, aligned_allocator<float, 32> >>& image, 
+  vector<vector<float, aligned_allocator<float, 32> >>& output){
   auto width = image[BORDER_SIZE].size()-BORDER_SIZE*2;
   auto height = image.size()-BORDER_SIZE*2;
 
@@ -64,7 +60,7 @@ void blur_5x5(
     cout << "finished loading entire kernel!\n";
 
     // place to store results for horizontal add
-    vector<float, aligned_allocator<float>> final_vector(8);
+    vector<float, aligned_allocator<float, 32>> final_vector(8);
 
     // #pragma omp for collapse(2)
     #pragma omp for
@@ -98,10 +94,8 @@ void blur_5x5(
 }
 
 void blur_convolve(
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& image, 
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& output, 
+  vector<vector<float, aligned_allocator<float, 32> >>& image, 
+  vector<vector<float, aligned_allocator<float, 32> >>& output, 
   size_t k){
   switch(k) {
     case 3:
@@ -168,8 +162,8 @@ void convolve(vector<vector<uint8_t>>& image,
   }
 }
 
-vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>> load_image(string filename){
+vector<vector<float, aligned_allocator<float, 32> >> 
+    load_image(string filename){
   ifstream input;
   input.open(filename);
   string line;
@@ -194,22 +188,24 @@ vector<vector<float, aligned_allocator<float>>,
     image_string += line;
   }
 
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>> image(height+BORDER_SIZE*2);
+  vector<vector<float, aligned_allocator<float, 32> >>
+    image(height+BORDER_SIZE*2);
   current = 0;
   previous = 0;
   // initialize borders to 0
   // top
   for (size_t i = 0; i < BORDER_SIZE; i++){
-    image[i] = vector<float, aligned_allocator<float>>(width+BORDER_SIZE*2);
+    image[i] = vector<float, aligned_allocator<float, 32>>(
+      width+BORDER_SIZE*2);
   }
   // bottom
   for (size_t i = image.size()-1; i >= image.size()-BORDER_SIZE; i--){
-    image[i] = vector<float, aligned_allocator<float>>(width+BORDER_SIZE*2);
+    image[i] = vector<float, aligned_allocator<float, 32>>(
+      width+BORDER_SIZE*2);
   }
 
   for (size_t i = BORDER_SIZE; i < height+BORDER_SIZE; i++){
-    vector<float, aligned_allocator<float>> row(width+BORDER_SIZE*2);
+    vector<float, aligned_allocator<float, 32>> row(width+BORDER_SIZE*2);
     for (size_t j = BORDER_SIZE; j < width+BORDER_SIZE; j++){
       current = image_string.find(delim, previous);
       row[j] = stoi(image_string.substr(previous, current-previous));
@@ -223,8 +219,9 @@ vector<vector<float, aligned_allocator<float>>,
   return image;
 }
 
-void save_image(vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>> image, string filename){
+void save_image(
+    vector<vector<float, aligned_allocator<float, 32> >> image,
+    string filename){
   ofstream output;
   output.open(filename);
   string row_output;
@@ -250,16 +247,13 @@ void save_image(vector<vector<float, aligned_allocator<float>>,
 }
 
 // m is length, n is height
-vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>> 
-generate_garbage_image(size_t m, size_t n){
+vector<vector<float, aligned_allocator<float, 32> >>
+    generate_garbage_image(size_t m, size_t n){
   // give it enough margin on both sides
-  vector<
-      vector<float, aligned_allocator<float>>,
-      aligned_allocator<vector<float>>
-    > result(n+BORDER_SIZE*2);
+  vector<vector<float, aligned_allocator<float, 32> >>
+    result(n+BORDER_SIZE*2);
   for(size_t i = 0; i < n+BORDER_SIZE*2; i++){
-    result[i] = vector<float, boost::alignment::aligned_allocator<float>>(
+    result[i] = vector<float, aligned_allocator<float, 32>>(
                   m+BORDER_SIZE*2);
     for(size_t j = 0; j < m+BORDER_SIZE*2; j++){
       result[i][j] = rand() % 256;

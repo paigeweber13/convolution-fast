@@ -9,10 +9,8 @@
 using namespace std;
 
 double time_single_test(
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& image, 
-  vector<vector<float, aligned_allocator<float>>,
-    aligned_allocator<vector<float>>>& output, 
+  vector<vector<float, aligned_allocator<float, 32> >>& image, 
+  vector<vector<float, aligned_allocator<float, 32> >>& output, 
   unsigned m, unsigned n, unsigned k){
     // generate dummy image of size m, n and kernel of size k. Convolve them
     // and report time.
