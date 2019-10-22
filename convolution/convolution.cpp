@@ -48,8 +48,8 @@ void blur_5x5(
   //   cout << endl;
   // }
 
-  // #pragma omp parallel
-  // {
+  #pragma omp parallel
+  {
     // load kernel
     // last three elements in each vector will be garbage, unfortunately
     auto kernel_row_1 = _mm256_load_ps(&blur_kernels[5][0][0]);
@@ -57,16 +57,14 @@ void blur_5x5(
     auto kernel_row_3 = _mm256_load_ps(&blur_kernels[5][2][0]);
     auto kernel_row_4 = _mm256_load_ps(&blur_kernels[5][3][0]);
     auto kernel_row_5 = _mm256_load_ps(&blur_kernels[5][4][0]);
-    cout << "finished loading entire kernel!\n";
 
     // place to store results for horizontal add
     vector<float, aligned_allocator<float, 32>> final_vector(8);
 
     // #pragma omp for collapse(2)
     #pragma omp for
-    for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y += 5){
-      cout << "row number: " + to_string(y) + "\n";
-      for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x += 5){
+    for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y ++){
+      for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x ++){
         auto image_row_1 = _mm256_load_ps(&image[y  ][x]);
         auto image_row_2 = _mm256_load_ps(&image[y+1][x]);
         auto image_row_3 = _mm256_load_ps(&image[y+2][x]);
@@ -81,16 +79,21 @@ void blur_5x5(
         auto e = _mm256_fmadd_ps (kernel_row_5, image_row_5, d);
 
         // replace the rest of the contents of this loop with hadd because
-        // we'll padd the remaining parts of kenerl with zeroes
+        // we'll padd the remaining parts of kernel with zeros
+        // __m256 _mm256_hadd_ps (__m256 a, __m256 b)
         _mm256_store_ps(&final_vector[0], e);
 
+        // cout << "final result: " + to_string(uint8_t(
+        //   final_vector[0] + final_vector[1] + final_vector[2] +
+        //   final_vector[3] + final_vector[4] + final_vector[5]
+        // ));
         output[y][x] = uint8_t(
           final_vector[0] + final_vector[1] + final_vector[2] +
           final_vector[3] + final_vector[4] + final_vector[5]
         );
       }
     }
-  // }
+  }
 }
 
 void blur_convolve(

@@ -70,4 +70,6 @@ aligned alloc:
 (DOUBLE performance zomg)
 
 hand-written intrinsics:
+8192,8192,5,0.051278,1.308739
+(faster again by about 2 times)
 
