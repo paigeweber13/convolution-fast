@@ -29,15 +29,17 @@ void blur_5x5(
   auto height = image.size()-BORDER_SIZE*2;
 
   // this code below shows that the memory is sequentially allocated, row-major
-  cout << "5x5 kernel info" << endl;
-  cout << "i, j: value  - memaddress" << endl;
-  for(size_t i = 0; i < 5; i++){
-    for(size_t j = 0; j < 8; j++){
-      cout << to_string(i) << ", " << to_string(j) << ": "
-           << blur_kernels[5][i][j] << " - " << &blur_kernels[5][i][j] << endl;
-    }
-    cout << endl;
-  }
+  // cout << "5x5 kernel info" << endl;
+  // cout << "i, j: value  - memaddress     - addr % 32" << endl;
+  // for(size_t i = 0; i < 5; i++){
+  //   for(size_t j = 0; j < 8; j++){
+  //     cout << to_string(i) << ", " << to_string(j) << ": "
+  //          << blur_kernels[5][i][j] << " - " << &blur_kernels[5][i][j]
+  //          << " - " << reinterpret_cast<intptr_t>(&blur_kernels[5][i][j]) % 32 
+  //          << endl;
+  //   }
+  //   cout << endl;
+  // }
 
   // however, since the images are huge, a 5x5 part of an image is NOT
   // sequentially allocated. We have to load from a few places in memory...
@@ -55,24 +57,11 @@ void blur_5x5(
     // load kernel
     // last three elements in each vector will be garbage, unfortunately
     auto kernel_row_1 = _mm256_load_ps(&blur_kernels[5][0][0]);
-    cout << "finished loading row 1!\n";
-    cout << "address of row 1: " << &blur_kernels[5][0][0] << endl;
-    cout << "address of row 1 mod 32: "
-         << reinterpret_cast<intptr_t>(&blur_kernels[5][0][0]) % 32 << endl;
-    auto kernel_row_3 = _mm256_load_ps(&blur_kernels[5][2][0]);
-    cout << "finished loading row 3!\n";
-    auto kernel_row_5 = _mm256_load_ps(&blur_kernels[5][4][0]);
-    cout << "finished loading row 5!\n";
-
-    // even numbers don't work for some reason
-    cout << "trying row 2...\n";
-    cout << "address of row 2: " << &blur_kernels[5][1][0] << endl;
-    cout << "address of row 2 mod 32: "
-         << reinterpret_cast<intptr_t>(&blur_kernels[5][1][0]) % 32 << endl;
     auto kernel_row_2 = _mm256_load_ps(&blur_kernels[5][1][0]);
-    cout << "finished loading row 2!\n";
+    auto kernel_row_3 = _mm256_load_ps(&blur_kernels[5][2][0]);
     auto kernel_row_4 = _mm256_load_ps(&blur_kernels[5][3][0]);
-    cout << "finished loading row 4!\n";
+    auto kernel_row_5 = _mm256_load_ps(&blur_kernels[5][4][0]);
+    cout << "finished loading entire kernel!\n";
 
     // place to store results for horizontal add
     vector<float, aligned_allocator<float>> final_vector(8);

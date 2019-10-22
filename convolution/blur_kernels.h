@@ -5,10 +5,9 @@
 
 using namespace std;
 
-const vector<
-        vector<vector<float>>,
-        boost::alignment::aligned_allocator<vector<vector<float>>>
-      > blur_kernels({
+const vector<vector<vector<
+            float, boost::alignment::aligned_allocator<float, 32>
+        >>> blur_kernels({
     {},
     {},
     {},
