@@ -124,8 +124,10 @@ void blur_convolve(
   }
 }
 
-void convolve(vector<vector<uint8_t>>& image, 
-    vector<vector<uint8_t>>& output_image, Kernel kernel){
+void convolve(
+    vector<vector<float, aligned_allocator<float, 32> >>& image, 
+    vector<vector<float, aligned_allocator<float, 32> >>& output_image, 
+    Kernel kernel){
   auto width = image[BORDER_SIZE].size()-BORDER_SIZE*2;
   auto height = image.size()-BORDER_SIZE*2;
   float sum = 0;
@@ -144,10 +146,6 @@ void convolve(vector<vector<uint8_t>>& image,
           sum += image[i+1][i+1]
     */
 
-    // tiling
-    #define X_TILE_SIZE 256
-    #define Y_TILE_SIZE 64
-    // tiles are assigned per processor
   #pragma omp parallel
   {
     #pragma omp for collapse(2)

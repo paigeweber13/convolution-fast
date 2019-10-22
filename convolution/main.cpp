@@ -19,6 +19,7 @@ double time_single_test(
 
     auto start_time = chrono::high_resolution_clock::now();
 
+    // convolve(image, output, kernel);
     blur_convolve(image, output, k);
 
     auto end_time = chrono::high_resolution_clock::now();
