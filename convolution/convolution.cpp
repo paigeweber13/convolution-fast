@@ -28,50 +28,62 @@ void blur_5x5(
   auto width = image[7].size()-14;
   auto height = image.size()-14;
 
+  // this code below shows that the memory is sequentially allocated, row-major
+  // cout << "memory addresses of 5x5 kernel" << endl;
+  // for(size_t i = 0; i < 5; i++){
+  //   for(size_t j = 0; j < 5; j++){
+  //     cout << to_string(i) << ", " << to_string(j) << ": "
+  //          << &blur_kernels[5][i][j] << endl;
+  //   }
+  // }
+
+  // however, since the images are huge, a 5x5 part of an image is NOT
+  // sequentially allocated. We have to load from a few places in memory...
+  // cout << "memory addresses of 5x5 part of image" << endl;
+  // for(size_t i = 100; i < 105; i++){
+  //   for(size_t j = 100; j < 105; j++){
+  //     cout << to_string(i) << ", " << to_string(j) << ": "
+  //          << &image[i][j] << endl;
+  //   }
+  //   cout << endl;
+  // }
+
   #pragma omp parallel
   {
     // load kernel
-    // __mm256_load_ps
+    // last three elements in each vector will be garbage, unfortunately
+    auto kernel_row_1 = _mm256_load_ps(&blur_kernels[5][0][0]);
+    auto kernel_row_2 = _mm256_load_ps(&blur_kernels[5][1][0]);
+    auto kernel_row_3 = _mm256_load_ps(&blur_kernels[5][2][0]);
+    auto kernel_row_4 = _mm256_load_ps(&blur_kernels[5][3][0]);
+    auto kernel_row_5 = _mm256_load_ps(&blur_kernels[5][4][0]);
+
+    // place to store results for horizontal add
+    vector<float, aligned_allocator<float>> final_vector(8);
+
     #pragma omp for collapse(2)
-    for(size_t y = 7; y < height+7; y++){
-      for(size_t x = 7; x < width+7; x++){
-        float sum = 0;
-        sum += image[y-2][x-2] * blur_kernels[5][0][0];
-        sum += image[y-2][x-1] * blur_kernels[5][0][1];
-        sum += image[y-2][x  ] * blur_kernels[5][0][2];
-        sum += image[y-2][x+1] * blur_kernels[5][0][3];
-        sum += image[y-2][x+2] * blur_kernels[5][0][4];
+    // we'll have to increase the size of the borders...
+    for(size_t y = 7; y < height+7; y += 5){
+      for(size_t x = 7; x < width+7; x += 5){
+        auto image_row_1 = _mm256_load_ps(&image[y  ][x]);
+        auto image_row_2 = _mm256_load_ps(&image[y+1][x]);
+        auto image_row_3 = _mm256_load_ps(&image[y+2][x]);
+        auto image_row_4 = _mm256_load_ps(&image[y+3][x]);
+        auto image_row_5 = _mm256_load_ps(&image[y+4][x]);
 
-        sum += image[y-1][x-2] * blur_kernels[5][1][0];
-        sum += image[y-1][x-1] * blur_kernels[5][1][1];
-        sum += image[y-1][x  ] * blur_kernels[5][1][2];
+        // a * b + c
+        auto a = _mm256_mul_ps (kernel_row_1, image_row_1);
+        auto b = _mm256_fmadd_ps (kernel_row_2, image_row_2, a);
+        auto c = _mm256_fmadd_ps (kernel_row_3, image_row_3, b);
+        auto d = _mm256_fmadd_ps (kernel_row_4, image_row_4, c);
+        auto e = _mm256_fmadd_ps (kernel_row_5, image_row_5, d);
 
-        // ---
-        sum += image[y-1][x+1] * blur_kernels[5][1][3];
-        sum += image[y-1][x+2] * blur_kernels[5][1][4];
+        _mm256_store_ps(&final_vector[0], e);
 
-        sum += image[y  ][x-2] * blur_kernels[5][2][0];
-        sum += image[y  ][x-1] * blur_kernels[5][2][1];
-        sum += image[y  ][x  ] * blur_kernels[5][2][2];
-        sum += image[y  ][x+1] * blur_kernels[5][2][3];
-        sum += image[y  ][x+2] * blur_kernels[5][2][4];
-
-        sum += image[y+1][x-2] * blur_kernels[5][3][0];
-        
-        // --
-        sum += image[y+1][x-1] * blur_kernels[5][3][1];
-        sum += image[y+1][x  ] * blur_kernels[5][3][2];
-        sum += image[y+1][x+1] * blur_kernels[5][3][3];
-        sum += image[y+1][x+2] * blur_kernels[5][3][4];
-
-        sum += image[y+2][x-2] * blur_kernels[5][4][0];
-        sum += image[y+2][x-1] * blur_kernels[5][4][1];
-        sum += image[y+2][x  ] * blur_kernels[5][4][2];
-        sum += image[y+2][x+1] * blur_kernels[5][4][3];
-
-        // --
-        sum += image[y+2][x+2] * blur_kernels[5][4][4];
-        output[y][x] = uint8_t(sum);
+        output[y][x] = uint8_t(
+          final_vector[0] + final_vector[1] + final_vector[2] +
+          final_vector[3] + final_vector[4] + final_vector[5]
+        );
       }
     }
   }
