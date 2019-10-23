@@ -30,9 +30,16 @@ All of these things except the last two either slowed performance or had no
 significant effect. The last two made a significant difference, each doubling
 the performance. However, they necessitated implementing 4.
 
-In the end, I saw performance gains of approximately...
+In the end, I saw performance gains of just over 4x, maxing out at about 4.2
+gigapixels per second. This is still less than the 6.7 gigapixels in my model,
+and I suspect that locality and memory performance have something to do with
+this.
+
+In the future, I think it would be good to spend some time improving the
+locality of this code. I would like to revisit tiling the image, as I feel that
+it's promising even though my initial implementation caused reduced
+performance. 
 
 current things queued on mamba: 
-31210 is fast new code, 100 iterations per k and m*n
 31217 is original basic code
 31232 is fast new code, 1 iteration per k and m*n
