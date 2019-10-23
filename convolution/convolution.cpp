@@ -78,15 +78,8 @@ void blur_5x5(
         auto d = _mm256_fmadd_ps (kernel_row_4, image_row_4, c);
         auto e = _mm256_fmadd_ps (kernel_row_5, image_row_5, d);
 
-        // replace the rest of the contents of this loop with hadd because
-        // we'll padd the remaining parts of kernel with zeros
-        // __m256 _mm256_hadd_ps (__m256 a, __m256 b)
         _mm256_store_ps(&final_vector[0], e);
 
-        // cout << "final result: " + to_string(uint8_t(
-        //   final_vector[0] + final_vector[1] + final_vector[2] +
-        //   final_vector[3] + final_vector[4] + final_vector[5]
-        // ));
         output[y][x] = uint8_t(
           final_vector[0] + final_vector[1] + final_vector[2] +
           final_vector[3] + final_vector[4] + final_vector[5]
