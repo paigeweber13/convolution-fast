@@ -14,12 +14,13 @@ double time_single_test(
   unsigned m, unsigned n, unsigned k){
     // Convolve them and report time.
     size_t num_runs = 100;
+    // auto kernel = generate_blur_kernel(k);
 
     auto start_time = chrono::high_resolution_clock::now();
 
-    // convolve(image, output, kernel);
     for(size_t i = 0; i < num_runs; i++){
       blur_convolve(image, output, k);
+      // convolve(image, output, kernel);
     }
 
     auto end_time = chrono::high_resolution_clock::now();
