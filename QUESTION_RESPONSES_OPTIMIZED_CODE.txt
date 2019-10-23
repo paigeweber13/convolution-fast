@@ -2,15 +2,17 @@ Measure and report performance on the new code:
 
 So, I discovered that my original results were incorrect because of how I was
 calculating gigapixels per second. I have recreated my results for the
-original, basic code and those results are available in the speedtest_basic*
-files in the data/ folder. The new, updated results are in the
-speedtest_optimized01* and speedtest_optimized02* files in the data/ folder.
-These are simply two different trials with my new code. The first ran 100
-trials on each combination of k and (n,m) and reported the average time per
-iteration. The second only ran one trial for each case.
+original, basic code but the mamba server was swamped when I went to rerun the
+basic code. The only comparison I have is a listed below:
 
-Additionally, and perhaps most importantly, data/speedtest_comparision.png
-shows the comparison of the basic and optimized code.
+m,n,k,time (s),gigapixels per second
+# basic code:
+8192,8192,5,0.199803,0.335875
+# final, optimized code:
+8192,8192,5,0.051278,1.30873
+
+The new, updated results are in the speedtest_optimized01* files in the data/ 
+folder.
 
 Due to lack of time spent on this project, optimized code has only been written
 for kernels of sizes 3, 5, 7, and 9. 
