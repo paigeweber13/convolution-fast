@@ -3,14 +3,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+
 def create_3d_plot(data):
     # give things useful names
-    gigapixels_per_second = data[:,4]
-    n_by_m = data[:,0] * data[:,1]
-    k = data[:,2]
+    gigapixels_per_second = data[:, 4]
+    n_by_m = data[:, 0] * data[:, 1]
+    k = data[:, 2]
 
     # make plot
-    fig = plt.figure(figsize=(9,9))
+    fig = plt.figure(figsize=(9, 9))
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(n_by_m, k, gigapixels_per_second)
     ax.set_xlabel('n*m (approx. bytes loaded)')
@@ -21,25 +22,25 @@ def create_3d_plot(data):
 
 def create_2d_plot_per_nm(data, colors):
     # give things useful names
-    gigapixels_per_second = data[:,4]
-    n_by_m = data[:,0] * data[:,1]
-    k = data[:,2]
+    gigapixels_per_second = data[:, 4]
+    n_by_m = data[:, 0] * data[:, 1]
+    k = data[:, 2]
 
     # gigapixels per second per n*m for each grouping of k
     data_by_k = {}
 
-    possible_k = sorted(np.unique(data[:,2]))
+    possible_k = sorted(np.unique(data[:, 2]))
 
     legend_values = []
     for k in possible_k:
         legend_values.append('k: ' + str(k))
         data_by_k[k] = np.array([x for x in data if x[2] == k])
 
-    plt.figure(figsize=(15,9))
+    plt.figure(figsize=(15, 9))
     i = 0
     for key in data_by_k:
-        plt.plot(data_by_k[key][:,0] * data_by_k[key][:,0],
-                 data_by_k[key][:,4], c=colors[i], marker='.')
+        plt.plot(data_by_k[key][:, 0] * data_by_k[key][:, 0],
+                 data_by_k[key][:, 4], c=colors[i], marker='.')
         i += 1
 
     plt.legend(legend_values)
@@ -51,9 +52,9 @@ def create_2d_plot_per_nm(data, colors):
 
 def create_2d_plot_per_k(data, colors):
     # give things useful names
-    gigapixels_per_second = data[:,4]
-    n_by_m = data[:,0] * data[:,1]
-    k = data[:,2]
+    gigapixels_per_second = data[:, 4]
+    n_by_m = data[:, 0] * data[:, 1]
+    k = data[:, 2]
 
     # gigapixels per second per k for each grouping of n*m
     data_by_size = {}
@@ -62,8 +63,8 @@ def create_2d_plot_per_k(data, colors):
         (1024, 768),
         (2048, 2048),
         (8192, 8192),
-        (4194304 , 768),
-        (16777216 , 768),
+        (4194304, 768),
+        (16777216, 768),
     }
 
     legend_values = []
@@ -76,7 +77,7 @@ def create_2d_plot_per_k(data, colors):
 
     i = 0
     for key in data_by_size_keys_sorted:
-        plt.plot(data_by_size[key][:,2], data_by_size[key][:,4], c=colors[i], 
+        plt.plot(data_by_size[key][:, 2], data_by_size[key][:, 4], c=colors[i],
                  marker='.')
         i += 1
 
@@ -86,7 +87,7 @@ def create_2d_plot_per_k(data, colors):
 
 
 def create_2d_plot_per_k_list(data_list, colors):
-    plt.figure(figsize=(15,9))
+    plt.figure(figsize=(15, 9))
     for data in data_list:
         create_2d_plot_per_k(data, colors)
     plt.show()
