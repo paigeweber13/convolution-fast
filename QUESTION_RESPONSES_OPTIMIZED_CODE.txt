@@ -1,0 +1,38 @@
+Measure and report performance on the new code:
+
+So, I discovered that my original results were incorrect because of how I was
+calculating gigapixels per second. I have recreated my results for the
+original, basic code and those results are available in the speedtest_basic*
+files in the data/ folder. The new, updated results are in the
+speedtest_optimized01* and speedtest_optimized02* files in the data/ folder.
+These are simply two different trials with my new code. The first ran 100
+trials on each combination of k and (n,m) and reported the average time per
+iteration. The second only ran one trial for each case.
+
+Additionally, and perhaps most importantly, data/speedtest_comparision.png
+shows the comparison of the basic and optimized code.
+
+Due to lack of time spent on this project, optimized code has only been written
+for kernels of sizes 3, 5, 7, and 9. 
+
+I went through several iterations trying to optimize my code. I utilized tools
+like llvm-mca and callgrind to help me optimize things. I took some notes in
+data/results_comparison.txt that talk very briefly about some of the things I
+tried. They are also listed here:
+ 1. passed things by reference to prevent copying
+ 2. added loops to "tile" the image and assign tiles to processors
+ 3. played with "#pragma omp for collapse(n)"
+ 4. unrolling for loops and creating separate functions for each kernel size
+ 5. aligning things to 32-byte boundaries
+ 6. hand-writing intrinsics
+
+All of these things except the last two either slowed performance or had no
+significant effect. The last two made a significant difference, each doubling
+the performance. However, they necessitated implementing 4.
+
+In the end, I saw performance gains of approximately...
+
+current things queued on mamba: 
+31210 is fast new code, 100 iterations per k and m*n
+31217 is original basic code
+31232 is fast new code, 1 iteration per k and m*n
