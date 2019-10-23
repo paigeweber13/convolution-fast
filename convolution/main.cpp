@@ -12,10 +12,7 @@ double time_single_test(
   vector<vector<float, aligned_allocator<float, 32> >>& image, 
   vector<vector<float, aligned_allocator<float, 32> >>& output, 
   unsigned m, unsigned n, unsigned k){
-    // generate dummy image of size m, n and kernel of size k. Convolve them
-    // and report time.
-    // auto image = generate_garbage_image(m, n);
-    // auto kernel = generate_blur_kernel(k);
+    // Convolve them and report time.
     size_t num_runs = 100;
 
     auto start_time = chrono::high_resolution_clock::now();
@@ -49,7 +46,8 @@ void test_and_output_various_sizes(){
   for (auto image_size : image_sizes){
     auto m = image_size[0];
     auto n = image_size[1];
-    // reuse images between kernels
+    // generate dummy image of size m, n and kernel of size k to be reusued
+    // between kernels
     auto image = generate_garbage_image(m, n);
     auto output = generate_garbage_image(m, n);
     for (auto kernel_size : kernel_sizes){
@@ -76,9 +74,6 @@ int main(int argc, char** argv){
     auto image = load_image(argv[1]);
     // creating output for blurred
     auto blurred = load_image(argv[1]);
-    // vector<vector<float, aligned_allocator<float>>,
-    //   aligned_allocator<vector<float>>> blurred();
-    // copy(image.begin(), image.end(), back_inserter(blurred))
     cout << "finished loading!" << endl;
 
     cout << "blurring..." << endl;
