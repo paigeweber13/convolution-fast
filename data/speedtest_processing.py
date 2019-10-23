@@ -22,8 +22,6 @@ def create_3d_plot(data):
 
 def create_2d_plot_per_nm(data, colors):
     # give things useful names
-    gigapixels_per_second = data[:, 4]
-    n_by_m = data[:, 0] * data[:, 1]
     k = data[:, 2]
 
     # gigapixels per second per n*m for each grouping of k
@@ -51,11 +49,6 @@ def create_2d_plot_per_nm(data, colors):
 
 
 def create_2d_plot_per_k(data, colors):
-    # give things useful names
-    gigapixels_per_second = data[:, 4]
-    n_by_m = data[:, 0] * data[:, 1]
-    k = data[:, 2]
-
     # gigapixels per second per k for each grouping of n*m
     data_by_size = {}
 
