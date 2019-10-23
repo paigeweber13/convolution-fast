@@ -290,7 +290,8 @@ void convolve(
 
   #pragma omp parallel
   {
-    #pragma omp for collapse(2)
+    // #pragma omp for collapse(2)
+    #pragma omp for
     for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y++){
       for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x++){
         sum = 0;
