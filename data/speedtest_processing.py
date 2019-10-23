@@ -32,13 +32,13 @@ print('min_gigapixels_per_second:   ',
       round(min_gigapixels_per_second, precision))
 
 # 3d plot
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# ax.scatter(n_by_m, k, gigapixels_per_second)
-# ax.set_xlabel('n*m (approx. bytes loaded)')
-# ax.set_ylabel('k')
-# ax.set_zlabel('gigapixels/s')
-# plt.show()
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(n_by_m, k, gigapixels_per_second)
+ax.set_xlabel('n*m (approx. bytes loaded)')
+ax.set_ylabel('k')
+ax.set_zlabel('gigapixels/s')
+plt.show()
 
 ### some projections
 # common variables:
@@ -57,8 +57,8 @@ for k in possible_k:
 plt.figure(figsize=(15,9))
 i = 0
 for key in data_by_k:
-    plt.scatter(data_by_k[key][:,0] * data_by_k[key][:,0],
-                data_by_k[key][:,4], c=colors[i], marker='.')
+    plt.plot(data_by_k[key][:,0] * data_by_k[key][:,0],
+             data_by_k[key][:,4], c=colors[i], marker='.')
     i += 1
 
 plt.legend(legend_values)
