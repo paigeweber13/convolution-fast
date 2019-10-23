@@ -13,7 +13,7 @@ double time_single_test(
   vector<vector<float, aligned_allocator<float, 32> >>& output, 
   unsigned m, unsigned n, unsigned k){
     // Convolve them and report time.
-    size_t num_runs = 100;
+    size_t num_runs = 1;
     // auto kernel = generate_blur_kernel(k);
 
     auto start_time = chrono::high_resolution_clock::now();
