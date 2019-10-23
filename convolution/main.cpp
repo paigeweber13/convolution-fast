@@ -16,15 +16,18 @@ double time_single_test(
     // and report time.
     // auto image = generate_garbage_image(m, n);
     // auto kernel = generate_blur_kernel(k);
+    size_t num_runs = 100;
 
     auto start_time = chrono::high_resolution_clock::now();
 
     // convolve(image, output, kernel);
-    blur_convolve(image, output, k);
+    for(size_t i = 0; i < num_runs; i++){
+      blur_convolve(image, output, k);
+    }
 
     auto end_time = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
-    double duration_seconds = duration/1e9;
+    double duration_seconds = duration/(num_runs*1e9);
     return duration_seconds;
 }
 
