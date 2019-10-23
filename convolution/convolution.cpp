@@ -7,12 +7,35 @@ void blur_3x3(
   vector<vector<float, aligned_allocator<float, 32> >>& output){
   auto width = image[BORDER_SIZE].size()-BORDER_SIZE*2;
   auto height = image.size()-BORDER_SIZE*2;
+
   #pragma omp parallel
   {
-    #pragma omp for collapse(2)
-    for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y++){
-      for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x++){
-        ;
+    // load kernel
+    // last five elements in each vector will be garbage, unfortunately
+    auto kernel_row_1 = _mm256_load_ps(&blur_kernels[3][0][0]);
+    auto kernel_row_2 = _mm256_load_ps(&blur_kernels[3][1][0]);
+    auto kernel_row_3 = _mm256_load_ps(&blur_kernels[3][2][0]);
+
+    // place to store results for horizontal add
+    vector<float, aligned_allocator<float, 32>> final_vector(8);
+
+    #pragma omp for
+    for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y ++){
+      for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x ++){
+        auto image_row_1 = _mm256_load_ps(&image[y  ][x]);
+        auto image_row_2 = _mm256_load_ps(&image[y+1][x]);
+        auto image_row_3 = _mm256_load_ps(&image[y+2][x]);
+
+        // a * b + c
+        auto a = _mm256_mul_ps (kernel_row_1, image_row_1);
+        auto b = _mm256_fmadd_ps (kernel_row_2, image_row_2, a);
+        auto c = _mm256_fmadd_ps (kernel_row_3, image_row_3, b);
+
+        _mm256_store_ps(&final_vector[0], c);
+
+        output[y][x] = uint8_t(
+          final_vector[0] + final_vector[1] + final_vector[2]
+        );
       }
     }
   }
@@ -61,7 +84,6 @@ void blur_5x5(
     // place to store results for horizontal add
     vector<float, aligned_allocator<float, 32>> final_vector(8);
 
-    // #pragma omp for collapse(2)
     #pragma omp for
     for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y ++){
       for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x ++){
@@ -89,6 +111,58 @@ void blur_5x5(
   }
 }
 
+void blur_7x7(
+  vector<vector<float, aligned_allocator<float, 32> >>& image, 
+  vector<vector<float, aligned_allocator<float, 32> >>& output){
+  auto width = image[BORDER_SIZE].size()-BORDER_SIZE*2;
+  auto height = image.size()-BORDER_SIZE*2;
+
+  #pragma omp parallel
+  {
+    // load kernel
+    auto kernel_row_1 = _mm256_load_ps(&blur_kernels[7][0][0]);
+    auto kernel_row_2 = _mm256_load_ps(&blur_kernels[7][1][0]);
+    auto kernel_row_3 = _mm256_load_ps(&blur_kernels[7][2][0]);
+    auto kernel_row_4 = _mm256_load_ps(&blur_kernels[7][3][0]);
+    auto kernel_row_5 = _mm256_load_ps(&blur_kernels[7][4][0]);
+    auto kernel_row_6 = _mm256_load_ps(&blur_kernels[7][5][0]);
+    auto kernel_row_7 = _mm256_load_ps(&blur_kernels[7][6][0]);
+
+    // place to store results for horizontal add
+    vector<float, aligned_allocator<float, 32>> final_vector(8);
+
+    #pragma omp for
+    for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y ++){
+      for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x ++){
+        auto image_row_1 = _mm256_load_ps(&image[y  ][x]);
+        auto image_row_2 = _mm256_load_ps(&image[y+1][x]);
+        auto image_row_3 = _mm256_load_ps(&image[y+2][x]);
+        auto image_row_4 = _mm256_load_ps(&image[y+3][x]);
+        auto image_row_5 = _mm256_load_ps(&image[y+4][x]);
+        auto image_row_6 = _mm256_load_ps(&image[y+5][x]);
+        auto image_row_7 = _mm256_load_ps(&image[y+6][x]);
+
+        // a * b + c
+        auto a = _mm256_mul_ps (kernel_row_1, image_row_1);
+        auto b = _mm256_fmadd_ps (kernel_row_2, image_row_2, a);
+        auto c = _mm256_fmadd_ps (kernel_row_3, image_row_3, b);
+        auto d = _mm256_fmadd_ps (kernel_row_4, image_row_4, c);
+        auto e = _mm256_fmadd_ps (kernel_row_5, image_row_5, d);
+        auto f = _mm256_fmadd_ps (kernel_row_6, image_row_6, e);
+        auto g = _mm256_fmadd_ps (kernel_row_7, image_row_7, f);
+
+        _mm256_store_ps(&final_vector[0], g);
+
+        output[y][x] = uint8_t(
+          final_vector[0] + final_vector[1] + final_vector[2] +
+          final_vector[3] + final_vector[4] + final_vector[5] +
+          final_vector[6] + final_vector[7]
+        );
+      }
+    }
+  }
+}
+
 void blur_convolve(
   vector<vector<float, aligned_allocator<float, 32> >>& image, 
   vector<vector<float, aligned_allocator<float, 32> >>& output, 
@@ -101,14 +175,19 @@ void blur_convolve(
       blur_5x5(image, output);
       break;
     case 7:
+      blur_7x7(image, output);
       break;
     case 9:
+      // blur_9x9(image, output);
       break;
     case 11:
+      // blur_11x11(image, output);
       break;
     case 13:
+      // blur_13x13(image, output);
       break;
     case 15:
+      // blur_15x15(image, output);
       break;
     default:
       throw runtime_error(
