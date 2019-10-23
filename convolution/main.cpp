@@ -53,7 +53,7 @@ void test_and_output_various_sizes(){
     for (auto kernel_size : kernel_sizes){
       auto single_test_time = time_single_test(image, output, m, n,
                                                kernel_size);
-      auto gigapixels_per_second = m*n/(single_test_time*1e9);
+      auto gigapixels_per_second = double(m)*double(n)/(single_test_time*1e9);
       cout << to_string(m) << "," << to_string(n) << ","
            << to_string(kernel_size) << ","
            << to_string(single_test_time) << ","
