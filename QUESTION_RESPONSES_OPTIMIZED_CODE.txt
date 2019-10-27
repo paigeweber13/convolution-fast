@@ -1,0 +1,47 @@
+Measure and report performance on the new code:
+
+So, I discovered that my original results were incorrect because of how I was
+calculating gigapixels per second. I have recreated my results for the
+original, basic code but the mamba server was swamped when I went to rerun the
+basic code. The only comparison I have is a listed below:
+
+m,n,k,time (s),gigapixels per second
+# basic code:
+8192,8192,5,0.199803,0.335875
+# final, optimized code:
+8192,8192,5,0.051278,1.30873
+
+The new, updated results are in the speedtest_optimized01* files in the data/ 
+folder.
+
+Due to lack of time spent on this project, optimized code has only been written
+for kernels of sizes 3, 5, 7, and 9. 
+
+I went through several iterations trying to optimize my code. I utilized tools
+like llvm-mca and callgrind to help me optimize things. I took some notes in
+data/results_comparison.txt that talk very briefly about some of the things I
+tried. They are also listed here:
+ 1. passed things by reference to prevent copying
+ 2. added loops to "tile" the image and assign tiles to processors
+ 3. played with "#pragma omp for collapse(n)"
+ 4. unrolling for loops and creating separate functions for each kernel size
+ 5. aligning things to 32-byte boundaries
+ 6. hand-writing intrinsics
+
+All of these things except the last two either slowed performance or had no
+significant effect. The last two made a significant difference, each doubling
+the performance. However, they necessitated implementing 4.
+
+In the end, I saw performance gains of just over 4x, maxing out at about 4.2
+gigapixels per second. This is still less than the 6.7 gigapixels in my model,
+and I suspect that locality and memory performance have something to do with
+this.
+
+In the future, I think it would be good to spend some time improving the
+locality of this code. I would like to revisit tiling the image, as I feel that
+it's promising even though my initial implementation caused reduced
+performance. 
+
+current things queued on mamba: 
+31217 is original basic code
+31232 is fast new code, 1 iteration per k and m*n
