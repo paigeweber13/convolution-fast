@@ -6,6 +6,7 @@ CXXASSEMBLYFLAGS=-S -fverbose-asm
 INCLUDES=-I/opt/arrayfire/include
 LIBRARIES=-L/opt/arrayfire/lib64
 FILES=$(wildcard convolution/*.cpp)
+OBJS=$(FILES:.cpp=.o)
 EXEC=convolution
 
 # conan
@@ -16,12 +17,15 @@ DEFINES         += $(addprefix -D, $(CONAN_DEFINES))
 
 all: compile
 
-assembly: $(FILES)
+assembly: $(OBJS)
 		$(CXX) $(INCLUDES) $(DEFINES) $(LIBRARIES) $(CXXFLAGS)\
 		$(CXXASSEMBLYFLAGS) $(FILES)
 
-compile: $(FILES)
+compile: $(OBJS)
 		$(CXX) $(INCLUDES) $(DEFINES) $(LIBRARIES) $(CXXFLAGS) $(FILES)
+
+%.o: %.cpp
+	$(CXX) -c $< -o $@
 
 test: compile
 		$(EXEC) tests/saturn-v-2048x2048-bw.pgm 3
