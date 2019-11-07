@@ -6,6 +6,7 @@ CXXASSEMBLYFLAGS=-S -fverbose-asm
 INCLUDES=-I/opt/arrayfire/include
 LIBRARIES=-L/opt/arrayfire/lib64
 FILES=$(wildcard convolution/*.cpp)
+EXEC=convolution
 
 # conan
 CFLAGS          += $(CONAN_CFLAGS)
@@ -23,10 +24,10 @@ compile: $(FILES)
 		$(CXX) $(INCLUDES) $(DEFINES) $(LIBRARIES) $(CXXFLAGS) $(FILES)
 
 test: compile
-		./a.out tests/saturn-v-2048x2048-bw.pgm 3
+		$(EXEC) tests/saturn-v-2048x2048-bw.pgm 3
 
 speedtest: compile
-		./a.out
+		$(EXEC)
 
 clean:
 		rm -f *.e* *.o* *.s
