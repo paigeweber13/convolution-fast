@@ -5,7 +5,7 @@ CXXFLAGS=-g -Wall -std=c++1y -march=native -mtune=native -fopenmp -O3 -laf
 CXXASSEMBLYFLAGS=-S -fverbose-asm
 INCLUDES=-I/opt/arrayfire/include
 LIBRARIES=-L/opt/arrayfire/lib64
-FILES=$(wildcard convolution/*.cpp)
+FILES=$(wildcard src/*.cpp)
 OBJS=$(FILES:.cpp=.o)
 EXEC=convolution
 
