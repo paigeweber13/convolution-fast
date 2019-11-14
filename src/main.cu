@@ -27,7 +27,7 @@ int main(int argc, char** argv){
     {"help", no_argument, nullptr, 'h'},
     {"arch", required_argument, nullptr, 'a'},
     {"image-input", required_argument, nullptr, 'i'},
-    {"image-output", optional_argument, nullptr, 'o'},
+    {"image-output", required_argument, nullptr, 'o'},
     // 3 arguments should be provided, they will be deferred to the end
     {"speedtest", no_argument, nullptr, 's'}, 
   };
@@ -44,12 +44,10 @@ int main(int argc, char** argv){
         arch = *optarg;
         break;
       case 'i':
-        image_input = *optarg;
+        image_input = optarg;
         break;
       case 'o':
-        if(optarg != 0){
-          image_output = *optarg;
-        }
+        image_output = optarg;
         break;
       case 's':
         speedtest = true;
@@ -73,6 +71,7 @@ int main(int argc, char** argv){
         time_single_cpu_test(m, n, k);
         break;
       case 'g':
+        // time_single_gpu_test(m, n, k);
         break;
       default:
         cout << "invalid architecture specified!" << endl;
@@ -161,5 +160,17 @@ void test_blur_image(string input_filename, string output_filename, char arch){
   cout << "saving image to " << output_filename << endl;
   Image::save_image(blurred, output_filename);
   cout << "finished saving!" << endl;
+
+  cout << "deleting kernel: ";
+  kernel.~Kernel();
+  cout << "done!" << endl;
+
+  cout << "deleting input image: ";
+  image.~Image();
+  cout << "done!" << endl;
+
+  cout << "deleting blurred image: ";
+  blurred.~Image();
+  cout << "done!" << endl;
 }
 
