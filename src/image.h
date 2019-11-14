@@ -18,9 +18,11 @@ class Image {
     float* at(size_t i, size_t j);
     void randomize();
     static Image load_image(string filename);
-    static void save_image(Image image, string filename);
+    static void save_image(Image &image, string filename);
     size_t get_m(); //height of image
     size_t get_n(); //width of image
+    size_t get_height(); // equivalent to get_m()
+    size_t get_width(); // equivalent to get_n()
 
   private:
     // m = width, n = height

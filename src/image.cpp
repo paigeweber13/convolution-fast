@@ -20,7 +20,9 @@ Image::~Image(){
 }
 
 size_t Image::get_m(){ return m; }
+size_t Image::get_height(){ return m; }
 size_t Image::get_n(){ return n; }
+size_t Image::get_width(){ return n; }
 
 float* Image::at(size_t i, size_t j){
   return &pixels[i][j];
@@ -68,7 +70,7 @@ Image Image::load_image(string filename){
   return image;
 }
 
-void Image::save_image(Image image, string filename){
+void Image::save_image(Image &image, string filename){
   ofstream output;
   output.open(filename);
   string row_output;
@@ -83,7 +85,7 @@ void Image::save_image(Image image, string filename){
   for(size_t i = 0; i < image.get_m(); i++){
     row_output = "";
     for(size_t j = 0; j < image.get_n(); j++){
-      row_output += to_string(uint8_t(*(image.at(i,j)))) + " ";
+      row_output += to_string(uint8_t(*image.at(i,j))) + " ";
     }
     output << row_output << endl;
   }
