@@ -15,7 +15,7 @@ namespace po = boost::program_options;
 void print_help();
 void time_single_gpu_test(size_t m, size_t n, size_t k);
 double time_single_cpu_test(unsigned m, unsigned n, unsigned k);
-void test_blur_image(string input_filename, string output_filename);
+void test_blur_image(string input_filename, string output_filename, char arch);
 
 int main(int argc, char** argv){
   if (argc < 2){
@@ -79,6 +79,9 @@ int main(int argc, char** argv){
         return 2;
     }
   }
+  else {
+    test_blur_image(image_input, image_output, arch);
+  }
 
   return 0;
 }
@@ -132,7 +135,7 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
   return duration_seconds;
 }
 
-void test_blur_image(string input_filename, string output_filename){
+void test_blur_image(string input_filename, string output_filename, char arch){
   cout << "Testing blur kernel on image " << input_filename << endl;
 
   cout << "loading image..." << endl;
@@ -145,7 +148,14 @@ void test_blur_image(string input_filename, string output_filename){
   // auto edges = convolve(image, generate_sobel_v_kernel());
   Kernel kernel(5);
   kernel.make_blur_kernel();
-  convolve(image, blurred, kernel);
+  switch(arch){
+    case 'c':
+      convolve(image, blurred, kernel);
+      break;
+    case 'g':
+      // convolve_gpu(image, blurred, kernel);
+      break;
+  }
   cout << "finished blurring!" << endl;
 
   cout << "saving image to " << output_filename << endl;
