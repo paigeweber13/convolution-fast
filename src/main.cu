@@ -18,6 +18,10 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k);
 void test_blur_image(string input_filename, string output_filename, char arch);
 
 int main(int argc, char** argv){
+  test_blur_image("tests/saturn-v-2048x2048-bw.pgm", "tests/saturn-v-out.pgm",
+                  'c');
+  return 0;
+
   if (argc < 2){
     print_help();
   }
