@@ -10,33 +10,13 @@
 #include <vector>
 
 // my stuff
-#include "blur_kernels.h"
 #include "kernel.h"
-#include "generate_kernels.h"
+#include "image.h"
 
 // size of margin/padding/border/whatever-you-call-it on each side of actual 
 // image
-#define BORDER_SIZE 7
 
 using namespace std;
-using namespace boost::alignment;
 
-void blur_convolve(
-  vector<vector<float, aligned_allocator<float, 32> >>& image, 
-  vector<vector<float, aligned_allocator<float, 32> >>& output, 
-    size_t k);
+void convolve(Image input_image, Image output_image, Kernel kernel);
 
-void convolve(
-    vector<vector<float, aligned_allocator<float, 32> >>& image, 
-    vector<vector<float, aligned_allocator<float, 32> >>& output_image, 
-    Kernel kernel);
-
-vector<vector<float, aligned_allocator<float, 32> >>
-    load_image(string filename);
-
-void save_image(
-    vector<vector<float, aligned_allocator<float, 32> >> image,
-    string filename);
-
-vector<vector<float, aligned_allocator<float, 32> >> 
-    generate_garbage_image(size_t m, size_t n);
