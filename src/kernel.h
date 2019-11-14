@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#define ALIGNMENT 32
+
 using namespace std;
 
 class Kernel {
@@ -15,10 +17,19 @@ class Kernel {
     ~Kernel();
     size_t get_k();
     int get_midpoint();
-    vector<vector<float>> values;
+    float ** values;
     string to_string();
+    Kernel generate_blur_kernel(size_t k);
+    // only the elements at odd indices from 3 to max_k inclusive have valid kernel
+    // objects. The rest contain garbage data.
+    
+    // YOU MUST MANUALLY DESTROY THESE KERNELS. ex:
+    // Kernel* = new k(3);
+    // k->~Kernel();
+    Kernel* generate_blur_kernels(size_t max_k);
 
   private:
     size_t k;
     int midpoint;
+    float bivariate_gaussian(float std_dev, float x, float y);
 };
