@@ -34,3 +34,4 @@ class Kernel {
     static float bivariate_gaussian(float std_dev, float x, float y);
     static Kernel generate_blur_kernel(size_t k);
 };
+
