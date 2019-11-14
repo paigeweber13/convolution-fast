@@ -4,3 +4,6 @@ convolution
 *.e*
 *.out
 *.swp
+*.pgm
+core.*
+*.sh.*
