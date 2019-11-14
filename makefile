@@ -20,11 +20,11 @@ DEFINES         += $(addprefix -D, $(CONAN_DEFINES))
 all: $(EXEC)
 
 #assembly: $(OBJS)
-#		$(CXX) $(INCLUDES) $(DEFINES) $(LIBRARIES) $(CXXFLAGS)\
-#		$(CXXASSEMBLYFLAGS) $(FILES)
+#	$(CXX) $(INCLUDES) $(DEFINES) $(LIBRARIES) $(CXXFLAGS)\
+#	$(CXXASSEMBLYFLAGS) $(FILES)
 
 $(EXEC): $(OBJS)
-		$(CUDAC) $(INCLUDES) $(DEFINES) $(LIBRARIES) $(CUDAFLAGS) $(FILES) -o $@
+	$(CUDAC) $(INCLUDES) $(DEFINES) $(LIBRARIES) $(CUDAFLAGS) $(FILES) -o $@
 
 %.o: %.cpp
 	$(CUDAC) $(INCLUDES) $(DEFINES) $(LIBRARIES) $(CUDAFLAGS) -c $< -o $@
@@ -33,10 +33,10 @@ $(EXEC): $(OBJS)
 	$(CUDAC) $(INCLUDES) $(DEFINES) $(LIBRARIES) $(CUDAFLAGS) -c $< -o $@
 
 test: $(EXEC)
-		$(EXEC) tests/saturn-v-2048x2048-bw.pgm 3
+	./queue.sh convolution.sh
 
 speedtest: $(EXEC)
-		$(EXEC)
+	$(EXEC)
 
 clean:
-		rm -f *.e* *.o* *.s
+	rm -f *.e* *.o* *.s
