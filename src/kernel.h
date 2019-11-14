@@ -19,17 +19,18 @@ class Kernel {
     int get_midpoint();
     float ** values;
     string to_string();
-    Kernel generate_blur_kernel(size_t k);
+    void make_blur_kernel();
     // only the elements at odd indices from 3 to max_k inclusive have valid kernel
     // objects. The rest contain garbage data.
     
     // YOU MUST MANUALLY DESTROY THESE KERNELS. ex:
     // Kernel* = new k(3);
     // k->~Kernel();
-    Kernel* generate_blur_kernels(size_t max_k);
+    static vector<Kernel> generate_blur_kernels(size_t max_k);
 
   private:
     size_t k;
     int midpoint;
-    float bivariate_gaussian(float std_dev, float x, float y);
+    static float bivariate_gaussian(float std_dev, float x, float y);
+    static Kernel generate_blur_kernel(size_t k);
 };

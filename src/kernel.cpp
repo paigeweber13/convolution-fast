@@ -52,12 +52,34 @@ string Kernel::to_string(){
   return ss.str();
 }
 
-float bivariate_gaussian(float std_dev, float x, float y){
+float Kernel::bivariate_gaussian(float std_dev, float x, float y){
   return 1/(2*M_PI*pow(std_dev, 2)) * 
     exp(-(pow(x, 2) + pow(y, 2))/(2*pow(std_dev,2)));
 }
 
-Kernel generate_blur_kernel(size_t k){
+void Kernel::make_blur_kernel(){
+  // will need tuning
+  // float std_dev = float(k) * 2/3;
+  float std_dev = 2.0;
+
+  float sum = 0.0;
+  for(int x = -midpoint; x <= midpoint; x++){
+    for(int y = -midpoint; y <= midpoint; y++){
+      auto current_value = bivariate_gaussian(std_dev, x, y);
+      values[x+midpoint][y+midpoint] = current_value;
+      sum += current_value;
+    }
+  }
+
+  // normalize!
+  for(size_t i = 0; i < get_k(); i++){
+    for(size_t j = 0; j < get_k(); j++){
+      values[i][j] /= sum;
+    }
+  }
+}
+
+Kernel Kernel::generate_blur_kernel(size_t k){
   Kernel result(k);
   // will need tuning
   // float std_dev = float(k) * 2/3;
@@ -83,7 +105,7 @@ Kernel generate_blur_kernel(size_t k){
   return result;
 }
 
-vector<Kernel> generate_blur_kernels(size_t max_k){
+vector<Kernel> Kernel::generate_blur_kernels(size_t max_k){
   vector<Kernel> result(max_k+1);
   for(size_t i = 3; i <= max_k; i += 2){
     result[i] = generate_blur_kernel(i);
