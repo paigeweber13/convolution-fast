@@ -3,3 +3,4 @@ convolution
 *.o*
 *.e*
 *.out
+*.swp
