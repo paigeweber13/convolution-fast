@@ -10,8 +10,8 @@
 #include <vector>
 
 // my stuff
-#include "kernel.h"
 #include "image.h"
+#include "kernel.h"
 
 // size of margin/padding/border/whatever-you-call-it on each side of actual 
 // image
