@@ -22,6 +22,10 @@ Image::~Image(){
 size_t Image::get_m(){ return m; }
 size_t Image::get_n(){ return n; }
 
+float* Image::at(size_t i, size_t j){
+  return &pixels[i][j];
+}
+
 Image Image::load_image(string filename){
   ifstream input;
   input.open(filename);
