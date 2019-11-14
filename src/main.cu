@@ -15,11 +15,12 @@ namespace po = boost::program_options;
 void print_help();
 void time_single_gpu_test(size_t m, size_t n, size_t k);
 double time_single_cpu_test(unsigned m, unsigned n, unsigned k);
-po::options_description get_program_options_desc();
 void test_blur_image(string input_filename, string output_filename);
 
 int main(int argc, char** argv){
-  auto desc = get_program_options_desc();
+  if (argc < 2){
+    print_help();
+  }
 
   const char* const short_opts = "ha:i:o::s";
   const option long_opts[] = {
@@ -76,7 +77,6 @@ int main(int argc, char** argv){
       default:
         cout << "invalid architecture specified!" << endl;
         return 2;
-        break;
     }
   }
 
@@ -85,16 +85,16 @@ int main(int argc, char** argv){
 
 void print_help(){
   std::cout <<
-    "-h, --help:                    Show help\n"
-    "-a, --arch <char>:             indicate if code should be run on cpu "
-                                    "(c) or gpu (g)\n"
-    "-i, --image-input <filename>:  image to blur\n"
-    "-o, --image-output <filename>: place to save image (has no effect "
-                                    "unless --image-input is also specified\n"
-                                    "note: for both image-input and "
-                                    "image-output, only ascii .pgm files are "
-                                    "supported."
-    "-s, --speedtest <m> <n> <k>:   time a test with given image size m, n "
+  "  -h, --help:                    Show help\n"
+  "  -a, --arch <char>:             indicate if code should be run on cpu \n"
+  "                                 (c) or gpu (g)\n"
+  "  -i, --image-input <filename>:  image to blur\n"
+  "  -o, --image-output <filename>: place to save image (has no effect\n"
+  "                                 unless --image-input is also specified\n"
+  "                                 note: for both image-input and \n"
+  "                                 image-output, only ascii .pgm files are \n"
+  "                                 supported.\n"
+  "  -s, --speedtest <m> <n> <k>:   time a test with given image size m, n\n"
                                     "and kernel size k\n";
   exit(1);
 }
