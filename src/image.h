@@ -29,8 +29,8 @@ class Image {
     void randomize();
 
     // operators
-    inline bool operator==(const Image& other);
-    inline bool operator!=(const Image& other);
+    bool operator==(Image& other);
+    bool operator!=(Image& other);
 
     // getters
     size_t get_m(); //height of image
@@ -43,6 +43,6 @@ class Image {
     size_t m;
     size_t n;
 
-    void allocate_pixel_memory(size_t m, size_t n, bool pinned){
+    void allocate_pixel_memory(size_t m, size_t n, bool pinned);
 };
 

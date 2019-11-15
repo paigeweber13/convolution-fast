@@ -50,7 +50,7 @@ size_t Image::get_height(){ return m; }
 size_t Image::get_n(){ return n; }
 size_t Image::get_width(){ return n; }
 
-inline bool operator==(Image& other){
+bool Image::operator==(Image& other){
   if(this->get_m() != other.get_m() || this->get_n() != other.get_n()){
     return false;
   }
@@ -66,7 +66,7 @@ inline bool operator==(Image& other){
   return true;
 }
 
-inline bool operator!=(Image& lhs, Image& );
+bool Image::operator!=(Image& other){ return !(*this == other); }
 
 float* Image::at(size_t i, size_t j){
   return &pixels[i+BORDER_SIZE][j+BORDER_SIZE];
