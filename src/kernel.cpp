@@ -1,5 +1,7 @@
 #include "kernel.h"
 
+#include <iostream>
+
 Kernel::Kernel(){
   Kernel(3);
 }
@@ -11,21 +13,28 @@ Kernel::Kernel(size_t k){
     throw "Unusable k. K must be odd.";
   } 
 
+  // cout << "allocating kernel..." << endl;
   values = (float **)aligned_alloc(ALIGNMENT, k*sizeof(float *));
 
   for (size_t i = 0; i < k; i++){
+    // cout << "allocating kernel row " << i << endl;
     values[i] = (float *)aligned_alloc(ALIGNMENT, k*sizeof(float));
   }
 
   this->k = k;
   midpoint = int(ceil(k/2));
+  // cout << "k: " << this->k << endl;
+  // cout << "midpoint: " << this->midpoint << endl;
 }
 
 Kernel::~Kernel(){
+  // cout << "freeing kernel..." << endl;
   for (size_t i = 0; i < k; i++){
+    // printf("freeing kernel row %lu\n", i);
     free(values[i]);
   }
 
+  // printf("freeing rest of kernel \n");
   free(values);
 }
 
