@@ -2,7 +2,6 @@
 #include <iostream>
 
 void convolve(Image & input_image, Image & output_image, Kernel & kernel){
-  float sum = 0;
   size_t k = kernel.get_k();
   size_t m = kernel.get_midpoint();
   size_t width = input_image.get_width();
@@ -22,6 +21,7 @@ void convolve(Image & input_image, Image & output_image, Kernel & kernel){
 
   #pragma omp parallel
   {
+    float sum;
     // #pragma omp for collapse(2)
     #pragma omp for
     for(size_t y = BORDER_SIZE; y < height-BORDER_SIZE; y++){
