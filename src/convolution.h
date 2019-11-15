@@ -18,5 +18,5 @@
 
 using namespace std;
 
-void convolve(Image input_image, Image output_image, Kernel kernel);
+void convolve(Image & input_image, Image & output_image, Kernel & kernel);
 

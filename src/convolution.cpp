@@ -1,9 +1,12 @@
 #include "convolution.h"
+#include <iostream>
 
-void convolve(Image input_image, Image output_image, Kernel kernel){
+void convolve(Image & input_image, Image & output_image, Kernel & kernel){
   float sum = 0;
   size_t k = kernel.get_k();
   size_t m = kernel.get_midpoint();
+  size_t width = input_image.get_width();
+  size_t height = input_image.get_height();
 
     /* speedup:
         * "#pragma omp for collapse(2)"
@@ -21,12 +24,13 @@ void convolve(Image input_image, Image output_image, Kernel kernel){
   {
     // #pragma omp for collapse(2)
     #pragma omp for
-    for(size_t y = 0; y < input_image.get_m(); y++){
-      for(size_t x = 0; x < input_image.get_n(); x++){
+    for(size_t y = BORDER_SIZE; y < height-BORDER_SIZE; y++){
+      for(size_t x = BORDER_SIZE; x < width-BORDER_SIZE; x++){
+        // printf("convolving pixel %lu, %lu\n", y, x);
         sum = 0;
         for(size_t n = 0; n < k; n++){
           for(size_t o = 0; o < k; o++){
-            sum += *input_image.at(y-m+o, x-m+n) * kernel.values[n][o];
+            sum += input_image.pixels[y-m+n][x-m+o] * kernel.values[n][o];
           }
         }
         *output_image.at(y, x) = uint8_t(sum);
