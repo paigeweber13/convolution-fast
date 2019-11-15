@@ -15,8 +15,13 @@ class Kernel {
     Kernel();
     Kernel(size_t k);
     ~Kernel();
+
     size_t get_k();
     int get_midpoint();
+
+    bool operator==(Kernel& other);
+    bool operator!=(Kernel& other);
+
     float ** values;
     string to_string();
     void make_blur_kernel();

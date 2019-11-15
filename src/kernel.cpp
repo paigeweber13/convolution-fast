@@ -38,13 +38,26 @@ Kernel::~Kernel(){
   free(values);
 }
 
-int Kernel::get_midpoint(){
-  return midpoint;
+int Kernel::get_midpoint(){ return midpoint; }
+size_t Kernel::get_k(){ return k; }
+
+bool Kernel::operator==(Kernel& other){
+  if(this->get_k() != other.get_k()){
+    return false;
+  }
+
+  for(size_t i = 0; i < k; i++){
+    for(size_t j = 0; j < k; j++){
+      if (this->values[i][j] != other.values[i][j]) {
+        return false;
+      }
+    }
+  }
+  
+  return true;
 }
 
-size_t Kernel::get_k(){
-  return k;
-}
+bool Kernel::operator!=(Kernel& other){ return !(*this == other); }
 
 string Kernel::to_string(){
   stringstream ss;
