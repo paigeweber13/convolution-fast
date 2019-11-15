@@ -42,6 +42,24 @@ size_t Image::get_height(){ return m; }
 size_t Image::get_n(){ return n; }
 size_t Image::get_width(){ return n; }
 
+inline bool operator==(const X& lhs, const X& rhs){
+  if(lhs.get_m() != rhs.get_m() || lhs.get_n() != rhs.get_n()){
+    return false;
+  }
+
+  for(size_t i = 0; i < m; i++){
+    for(size_t j = 0; j < n; j++){
+      if (*lhs.at(i, j) != *rhs.at(i, j)) {
+        return false;
+      }
+    }
+  }
+  
+  return true;
+}
+
+inline bool operator!=(const X& lhs, const X& rhs){ return !(lhs == rhs); }
+
 float* Image::at(size_t i, size_t j){
   return &pixels[i+BORDER_SIZE][j+BORDER_SIZE];
 }
