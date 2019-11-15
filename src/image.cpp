@@ -52,7 +52,7 @@ size_t Image::get_n(){ return n; }
 size_t Image::get_width(){ return n; }
 
 float* Image::at(size_t i, size_t j){
-  return &pixels[i][j];
+  return &pixels[i+BORDER_SIZE][j+BORDER_SIZE];
 }
 
 Image Image::load_image(string filename){
