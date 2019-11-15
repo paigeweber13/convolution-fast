@@ -16,13 +16,16 @@ void print_help();
 void time_single_gpu_test(size_t m, size_t n, size_t k);
 double time_single_cpu_test(unsigned m, unsigned n, unsigned k);
 void test_blur_image(string input_filename, string output_filename, char arch);
+void run_tests(char arch, string image_input);
+bool test_image_equality(string image_input);
+bool test_kernel_equality();
 
 int main(int argc, char** argv){
   if (argc < 2){
     print_help();
   }
 
-  const char* const short_opts = "ha:i:o:s";
+  const char* const short_opts = "ha:i:o:st";
   const option long_opts[] = {
     {"help", no_argument, nullptr, 'h'},
     {"arch", required_argument, nullptr, 'a'},
@@ -30,12 +33,14 @@ int main(int argc, char** argv){
     {"image-output", required_argument, nullptr, 'o'},
     // 3 arguments should be provided, they will be deferred to the end
     {"speedtest", no_argument, nullptr, 's'}, 
+    {"test", no_argument, nullptr, 's'}, 
   };
 
   char arch = 'c'; 
   string image_input = "";
   string image_output = "output.pgm";
   bool speedtest = false;
+  bool test = false;
 
   auto opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
   while (opt != -1) {
@@ -52,6 +57,10 @@ int main(int argc, char** argv){
       case 's':
         speedtest = true;
         break;
+      case 't':
+        test = true;
+        image_input = string(optarg);
+        break;
 
       case 'h':
       default:
@@ -61,7 +70,10 @@ int main(int argc, char** argv){
     opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
   }
 
-  if (speedtest) {
+  if (test) {
+    run_tests(arch, image_input);
+  }
+  else if (speedtest) {
     auto m = stoul(argv[optind]);
     auto n = stoul(argv[optind+1]);
     auto k = stoul(argv[optind+2]);
@@ -165,5 +177,42 @@ void test_blur_image(string input_filename, string output_filename, char arch){
   cout << "saving image to " << output_filename << endl;
   Image::save_image(blurred, output_filename);
   cout << "saving complete!" << endl;
+}
+
+void run_tests(char arch, string image_input){
+  test_image_equality(image_input);
+  test_kernel_equality();
+
+  switch (arch) {
+    case 'c':
+      break;
+    case 'g':
+      break;
+    default:
+      cout << "invalid architecture specified!" << endl;
+      return 2;
+  }
+}
+
+bool test_image_equality(string image_input){
+  auto lhs = Image::load_image(image_input);
+  auto rhs = Image::load_image(image_input);
+  return lhs == rhs;
+}
+
+bool test_kernel_equality(){
+  for (size_t i = 3; i < 16; i+=2){
+    Kernel kernel1(i);
+    Kernel kernel2(i);
+  
+    kernel1.make_blur();
+    kernel2.make_blur();
+    
+    if (kernel1 != kernel2){
+      return false;
+    }
+  }
+
+  return true;
 }
 
