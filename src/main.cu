@@ -211,9 +211,9 @@ bool test_kernel_equality(){
     kernel1.make_blur_kernel();
     kernel2.make_blur_kernel();
     
-    // if (kernel1 != kernel2){
-    //   return false;
-    // }
+    if (kernel1 != kernel2){
+      return false;
+    }
   }
 
   return true;
