@@ -7,6 +7,7 @@
 
 #define ALIGNMENT 32
 #define BORDER_SIZE 7
+#define BORDER_VALUE 122
 
 using namespace std;
 

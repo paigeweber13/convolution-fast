@@ -19,15 +19,15 @@ Image::Image(size_t m, size_t n){
 
     if (i < BORDER_SIZE || i >= m){
       for(size_t j = 0; j < n+2*BORDER_SIZE; j++){
-        pixels[i][j] = 0;
+        pixels[i][j] = BORDER_VALUE;
       }
     }
     else {
       for(size_t j = 0; j < BORDER_SIZE; j++){
-        pixels[i][j] = 0;
+        pixels[i][j] = BORDER_VALUE;
       }
       for(size_t j = n; j < n+BORDER_SIZE; j++){
-        pixels[i][j] = 0;
+        pixels[i][j] = BORDER_VALUE;
       }
     }
   }
