@@ -16,6 +16,20 @@ Image::Image(size_t m, size_t n){
   for(size_t i = 0; i < m+2*BORDER_SIZE; i++){
     // cout << "allocating row " << i << endl;
     pixels[i] = (float*)aligned_alloc(ALIGNMENT, sizeof(float)*(n+BORDER_SIZE*2));
+
+    if (i < BORDER_SIZE || i >= m){
+      for(size_t j = 0; j < n+2*BORDER_SIZE; j++){
+        pixels[i][j] = 0;
+      }
+    }
+    else {
+      for(size_t j = 0; j < BORDER_SIZE; j++){
+        pixels[i][j] = 0;
+      }
+      for(size_t j = n; j < n+BORDER_SIZE; j++){
+        pixels[i][j] = 0;
+      }
+    }
   }
 }
 
@@ -41,7 +55,6 @@ float* Image::at(size_t i, size_t j){
   return &pixels[i][j];
 }
 
-  #include <iostream>
 Image Image::load_image(string filename){
   ifstream input;
   input.open(filename);
@@ -100,6 +113,9 @@ void Image::save_image(Image &image, string filename){
     row_output = "";
     for(size_t j = 0; j < image.get_n(); j++){
       row_output += to_string(uint8_t(*image.at(i,j))) + " ";
+      // if (*image.at(i, j) == 0 && (i < 10 || j < 10)){
+      //   printf("zero at %lu, %lu\n", i, j);
+      // }
     }
     output << row_output << endl;
   }
@@ -118,3 +134,4 @@ void Image::randomize(){
     }
   }
 }
+
