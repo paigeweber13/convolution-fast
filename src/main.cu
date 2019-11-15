@@ -81,7 +81,7 @@ int main(int argc, char** argv){
     }
 
     const double pixels_to_megapixels = 1e-6;
-    const double seconds_to_milliseconds = 1e3;
+    // const double seconds_to_milliseconds = 1e3;
     printf("%10lu, %10lu, %2lu, %10.3f, %10.3f\n", m, n, k, time,
            double(m*n) * pixels_to_megapixels 
            / (time));
@@ -163,5 +163,9 @@ void test_blur_image(string input_filename, string output_filename, char arch){
       break;
   }
   cout << "finished blurring!" << endl;
+
+  cout << "saving image to " << output_filename << endl;
+  Image::save_image(blurred, output_filename);
+  cout << "saving complete!" << endl;
 }
 
