@@ -18,7 +18,6 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k);
 void test_blur_image(string input_filename, string output_filename, char arch);
 
 int main(int argc, char** argv){
-  // time_single_cpu_test(10, 10, 3);
   if (argc < 2){
     print_help();
   }
@@ -151,7 +150,6 @@ void test_blur_image(string input_filename, string output_filename, char arch){
   cout << "finished loading!" << endl;
 
   cout << "blurring..." << endl;
-  // auto edges = convolve(image, generate_sobel_v_kernel());
   Kernel kernel(5);
   kernel.make_blur_kernel();
   switch(arch){

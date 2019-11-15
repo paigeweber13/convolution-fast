@@ -26,7 +26,6 @@ void convolve(Image & input_image, Image & output_image, Kernel & kernel){
     #pragma omp for
     for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y++){
       for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x++){
-        // printf("convolving pixel %lu, %lu\n", y, x);
         sum = 0;
         for(size_t n = 0; n < k; n++){
           for(size_t o = 0; o < k; o++){
