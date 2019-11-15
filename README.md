@@ -11,3 +11,9 @@ first, make sure you have conan installed (`pip install conan`)
     conan install ..
     cd ..
     make
+
+# TODO:
+ - image output has borders
+ - write GPU code
+ - use CPU code to check GPU code for correctness
+
