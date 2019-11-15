@@ -24,8 +24,8 @@ void convolve(Image & input_image, Image & output_image, Kernel & kernel){
     float sum;
     // #pragma omp for collapse(2)
     #pragma omp for
-    for(size_t y = BORDER_SIZE; y < height-BORDER_SIZE; y++){
-      for(size_t x = BORDER_SIZE; x < width-BORDER_SIZE; x++){
+    for(size_t y = BORDER_SIZE; y < height+BORDER_SIZE; y++){
+      for(size_t x = BORDER_SIZE; x < width+BORDER_SIZE; x++){
         // printf("convolving pixel %lu, %lu\n", y, x);
         sum = 0;
         for(size_t n = 0; n < k; n++){
@@ -33,7 +33,7 @@ void convolve(Image & input_image, Image & output_image, Kernel & kernel){
             sum += input_image.pixels[y-m+n][x-m+o] * kernel.values[n][o];
           }
         }
-        *output_image.at(y, x) = uint8_t(sum);
+        output_image.pixels[y][x] = uint8_t(sum);
       }
     }
   }
