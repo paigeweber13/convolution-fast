@@ -5,6 +5,22 @@ Image::Image(){
 }
 
 Image::Image(size_t m, size_t n){
+  allocate_pixel_memory(m, n, false);
+}
+
+Image::Image(size_t m, size_t n, bool pinned){
+  allocate_pixel_memory(m, n, pinned);
+}
+
+Image::~Image(){
+  for(size_t i = 0; i < m+2*BORDER_SIZE; i++){
+    free(pixels[i]);
+  }
+
+  free(pixels);
+}
+
+void Image::allocate_pixel_memory(size_t m, size_t n, bool pinned){
   this->m = m;
   this->n = n;
 
@@ -29,27 +45,19 @@ Image::Image(size_t m, size_t n){
   }
 }
 
-Image::~Image(){
-  for(size_t i = 0; i < m+2*BORDER_SIZE; i++){
-    free(pixels[i]);
-  }
-
-  free(pixels);
-}
-
 size_t Image::get_m(){ return m; }
 size_t Image::get_height(){ return m; }
 size_t Image::get_n(){ return n; }
 size_t Image::get_width(){ return n; }
 
-inline bool operator==(const X& lhs, const X& rhs){
-  if(lhs.get_m() != rhs.get_m() || lhs.get_n() != rhs.get_n()){
+inline bool operator==(Image& other){
+  if(this->get_m() != other.get_m() || this->get_n() != other.get_n()){
     return false;
   }
 
   for(size_t i = 0; i < m; i++){
     for(size_t j = 0; j < n; j++){
-      if (*lhs.at(i, j) != *rhs.at(i, j)) {
+      if (*this->at(i, j) != *other.at(i, j)) {
         return false;
       }
     }
@@ -58,7 +66,7 @@ inline bool operator==(const X& lhs, const X& rhs){
   return true;
 }
 
-inline bool operator!=(const X& lhs, const X& rhs){ return !(lhs == rhs); }
+inline bool operator!=(Image& lhs, Image& );
 
 float* Image::at(size_t i, size_t j){
   return &pixels[i+BORDER_SIZE][j+BORDER_SIZE];

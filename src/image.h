@@ -19,6 +19,7 @@ class Image {
 
     // constructors/destructors
     Image();
+    Image(size_t m, size_t n);
     Image(size_t m, size_t n, bool pinned);
     ~Image();
 
@@ -28,8 +29,8 @@ class Image {
     void randomize();
 
     // operators
-    inline bool operator==(const X& lhs, const X& rhs);
-    inline bool operator!=(const X& lhs, const X& rhs);
+    inline bool operator==(const Image& other);
+    inline bool operator!=(const Image& other);
 
     // getters
     size_t get_m(); //height of image
@@ -41,5 +42,7 @@ class Image {
     // m = width, n = height
     size_t m;
     size_t n;
+
+    void allocate_pixel_memory(size_t m, size_t n, bool pinned){
 };
 
