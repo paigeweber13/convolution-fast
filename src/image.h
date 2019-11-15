@@ -16,6 +16,7 @@ class Image {
     Image(size_t m, size_t n);
     ~Image();
     float* at(size_t i, size_t j);
+    float** pixels;
     void randomize();
     static Image load_image(string filename);
     static void save_image(Image &image, string filename);
@@ -28,6 +29,5 @@ class Image {
     // m = width, n = height
     size_t m;
     size_t n;
-    float** pixels;
 };
 

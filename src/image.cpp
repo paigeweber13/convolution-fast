@@ -1,18 +1,31 @@
 #include "image.h"
+#include <iostream>
 
 Image::Image(){
 }
 
 Image::Image(size_t m, size_t n){
+  // cout << "allocating..." << endl;
+  // cout << "m: " << m << " n: " << n << endl;
+  // cout << "m+BORDER_SIZE*2: " << m+BORDER_SIZE*2 << endl;
+  this->m = m;
+  this->n = n;
+
   pixels = (float**)aligned_alloc(ALIGNMENT, sizeof(float*)*(m+BORDER_SIZE*2));
 
   for(size_t i = 0; i < m+2*BORDER_SIZE; i++){
+    // cout << "allocating row " << i << endl;
     pixels[i] = (float*)aligned_alloc(ALIGNMENT, sizeof(float)*(n+BORDER_SIZE*2));
   }
 }
 
 Image::~Image(){
+  // cout << "freeing..." << endl;
+  // cout << "m: " << m << " n: " << n << endl;
+  // cout << "m+BORDER_SIZE*2: " << m+BORDER_SIZE*2 << endl;
+
   for(size_t i = 0; i < m+2*BORDER_SIZE; i++){
+    // cout << "freeing row " << i << endl;
     free(pixels[i]);
   }
 
@@ -28,6 +41,7 @@ float* Image::at(size_t i, size_t j){
   return &pixels[i][j];
 }
 
+  #include <iostream>
 Image Image::load_image(string filename){
   ifstream input;
   input.open(filename);
@@ -95,9 +109,11 @@ void Image::save_image(Image &image, string filename){
 
 // m is height, n is length
 void Image::randomize(){
-  // give it enough margin on both sides
+  // cout << "randomizing..." << endl;
+  // cout << "m, n: " << m << ", " << n << endl;
   for(size_t i = 0; i < m; i++){
     for(size_t j = 0; j < n; j++){
+      // cout << "i, j: " << i << ", " << j << endl;
       *at(i, j) = rand() % 256;
     }
   }
