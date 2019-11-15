@@ -18,75 +18,75 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k);
 void test_blur_image(string input_filename, string output_filename, char arch);
 
 int main(int argc, char** argv){
-  test_blur_image("tests/saturn-v-2048x2048-bw.pgm", "tests/saturn-v-out.pgm",
-                  'c');
+  // time_single_cpu_test(10, 10, 3);
+  test_blur_image("tests/saturn-v-2048x2048-bw.pgm", "tests/saturn-v-out.pgm", 'c');
   return 0;
 
-  if (argc < 2){
-    print_help();
-  }
-
-  const char* const short_opts = "ha:i:o::s";
-  const option long_opts[] = {
-    {"help", no_argument, nullptr, 'h'},
-    {"arch", required_argument, nullptr, 'a'},
-    {"image-input", required_argument, nullptr, 'i'},
-    {"image-output", required_argument, nullptr, 'o'},
-    // 3 arguments should be provided, they will be deferred to the end
-    {"speedtest", no_argument, nullptr, 's'}, 
-  };
-
-  char arch = 'c'; 
-  string image_input = "";
-  string image_output = "output.pgm";
-  bool speedtest = false;
-
-  auto opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
-  while (opt != -1) {
-    switch (opt){
-      case 'a':
-        arch = *optarg;
-        break;
-      case 'i':
-        image_input = optarg;
-        break;
-      case 'o':
-        image_output = optarg;
-        break;
-      case 's':
-        speedtest = true;
-        break;
-
-      case 'h':
-      default:
-        print_help();
-        break;
-    }
-    opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
-  }
-
-  if (speedtest) {
-    auto m = stoul(argv[optind]);
-    auto n = stoul(argv[optind+1]);
-    auto k = stoul(argv[optind+2]);
-
-    switch (arch) {
-      case 'c':
-        time_single_cpu_test(m, n, k);
-        break;
-      case 'g':
-        // time_single_gpu_test(m, n, k);
-        break;
-      default:
-        cout << "invalid architecture specified!" << endl;
-        return 2;
-    }
-  }
-  else {
-    test_blur_image(image_input, image_output, arch);
-  }
-
-  return 0;
+//   if (argc < 2){
+//     print_help();
+//   }
+// 
+//   const char* const short_opts = "ha:i:o::s";
+//   const option long_opts[] = {
+//     {"help", no_argument, nullptr, 'h'},
+//     {"arch", required_argument, nullptr, 'a'},
+//     {"image-input", required_argument, nullptr, 'i'},
+//     {"image-output", required_argument, nullptr, 'o'},
+//     // 3 arguments should be provided, they will be deferred to the end
+//     {"speedtest", no_argument, nullptr, 's'}, 
+//   };
+// 
+//   char arch = 'c'; 
+//   string image_input = "";
+//   string image_output = "output.pgm";
+//   bool speedtest = false;
+// 
+//   auto opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
+//   while (opt != -1) {
+//     switch (opt){
+//       case 'a':
+//         arch = *optarg;
+//         break;
+//       case 'i':
+//         image_input = optarg;
+//         break;
+//       case 'o':
+//         image_output = optarg;
+//         break;
+//       case 's':
+//         speedtest = true;
+//         break;
+// 
+//       case 'h':
+//       default:
+//         print_help();
+//         break;
+//     }
+//     opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
+//   }
+// 
+//   if (speedtest) {
+//     auto m = stoul(argv[optind]);
+//     auto n = stoul(argv[optind+1]);
+//     auto k = stoul(argv[optind+2]);
+// 
+//     switch (arch) {
+//       case 'c':
+//         time_single_cpu_test(m, n, k);
+//         break;
+//       case 'g':
+//         // time_single_gpu_test(m, n, k);
+//         break;
+//       default:
+//         cout << "invalid architecture specified!" << endl;
+//         return 2;
+//     }
+//   }
+//   else {
+//     test_blur_image(image_input, image_output, arch);
+//   }
+// 
+//   return 0;
 }
 
 void print_help(){
@@ -160,21 +160,5 @@ void test_blur_image(string input_filename, string output_filename, char arch){
       break;
   }
   cout << "finished blurring!" << endl;
-
-  cout << "saving image to " << output_filename << endl;
-  Image::save_image(blurred, output_filename);
-  cout << "finished saving!" << endl;
-
-  cout << "deleting kernel: ";
-  kernel.~Kernel();
-  cout << "done!" << endl;
-
-  cout << "deleting input image: ";
-  image.~Image();
-  cout << "done!" << endl;
-
-  cout << "deleting blurred image: ";
-  blurred.~Image();
-  cout << "done!" << endl;
 }
 
