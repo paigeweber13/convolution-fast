@@ -23,8 +23,12 @@ class Kernel {
     bool operator!=(Kernel& other);
 
     float ** values;
+    cudaArray_t gpu_values;
+
     string to_string();
     void make_blur_kernel();
+    void copy_to_gpu();
+
     // only the elements at odd indices from 3 to max_k inclusive have valid kernel
     // objects. The rest contain garbage data.
     
@@ -36,6 +40,7 @@ class Kernel {
   private:
     size_t k;
     int midpoint;
+    bool is_on_gpu;
     static float bivariate_gaussian(float std_dev, float x, float y);
     static Kernel generate_blur_kernel(size_t k);
 };

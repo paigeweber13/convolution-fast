@@ -101,6 +101,15 @@ void Kernel::make_blur_kernel(){
   }
 }
 
+void Kernel::copy_to_gpu(){
+  is_on_gpu = true;
+
+  auto desc = cudaCreateChannelDex(k, k, 0, 0, cudaChannelFormatKindFloat);
+  auto extent = make_cudaExtent(k, k, 0);
+
+  cudaMalloc3DArray(gpu_values, desc, extent);
+}
+
 Kernel Kernel::generate_blur_kernel(size_t k){
   Kernel result(k);
   // will need tuning
