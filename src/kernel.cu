@@ -15,6 +15,7 @@ Kernel::Kernel(size_t k){
 
   // cout << "allocating kernel..." << endl;
   values = (float **)aligned_alloc(ALIGNMENT, k*sizeof(float *));
+  is_on_gpu = false;
 
   for (size_t i = 0; i < k; i++){
     // cout << "allocating kernel row " << i << endl;
@@ -36,6 +37,15 @@ Kernel::~Kernel(){
 
   // printf("freeing rest of kernel \n");
   free(values);
+
+  if (is_on_gpu) {
+    for (size_t i = 0; i < k; i++){
+      cudaFree(gpu_values[i]);
+    }
+
+    cudaFree(d_gpu_values);
+    free(gpu_values);
+  }
 }
 
 int Kernel::get_midpoint(){ return midpoint; }
@@ -104,10 +114,26 @@ void Kernel::make_blur_kernel(){
 void Kernel::copy_to_gpu(){
   is_on_gpu = true;
 
-  auto desc = cudaCreateChannelDex(k, k, 0, 0, cudaChannelFormatKindFloat);
-  auto extent = make_cudaExtent(k, k, 0);
+  vector<cudaError_t> errors;
 
-  cudaMalloc3DArray(gpu_values, desc, extent);
+  gpu_values = (float**)aligned_alloc(ALIGNMENT, sizeof(float*)*k);
+
+  for (size_t i = 0; i < k; i++){
+    errors.push_back(cudaMalloc(&gpu_values[i], sizeof(float)*k));
+    errors.push_back(cudaMemcpy(gpu_values[i], values[i], sizeof(float)*k,
+                                cudaMemcpyDefault));
+  }
+
+  errors.push_back(cudaMemcpy(d_gpu_values, d_gpu_values, sizeof(float*)*k,
+                              cudaMemcpyDefault));
+
+  for (size_t i = 0; i < errors.size(); i++){
+    if(errors[i] != 0){
+      cerr << "error number " << i << ": " 
+           << cudaGetErrorName(errors[i]) << endl
+           << cudaGetErrorString(errors[i]) << endl;
+    }
+  }
 }
 
 Kernel Kernel::generate_blur_kernel(size_t k){

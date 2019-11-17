@@ -23,7 +23,8 @@ class Kernel {
     bool operator!=(Kernel& other);
 
     float ** values;
-    cudaArray_t gpu_values;
+    float ** gpu_values;
+    float ** d_gpu_values;
 
     string to_string();
     void make_blur_kernel();
