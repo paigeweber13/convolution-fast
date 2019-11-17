@@ -19,6 +19,7 @@ void test_blur_image(string input_filename, string output_filename, char arch);
 void run_tests(char arch, string image_input);
 bool test_image_equality(string image_input);
 bool test_kernel_equality();
+bool test_copy_kernel_to_gpu();
 
 int main(int argc, char** argv){
   if (argc < 2){
@@ -181,15 +182,17 @@ void test_blur_image(string input_filename, string output_filename, char arch){
 
 void run_tests(char arch, string image_input){
   printf("In tests, 1s are successes, 0s are failures\n");
-  printf("testing image equality operator:  %i\n", 
-         test_image_equality(image_input));
-  printf("testing kernel equality operator: %i\n", 
-         test_kernel_equality());
 
   switch (arch) {
     case 'c':
+      printf("testing image equality operator:  %i\n", 
+             test_image_equality(image_input));
+      printf("testing kernel equality operator: %i\n", 
+             test_kernel_equality());
       break;
     case 'g':
+      printf("testing copy kernel to gpu: %i\n", 
+             test_copy_kernel_to_gpu());
       break;
     default:
       cout << "invalid architecture specified!" << endl;
@@ -216,6 +219,15 @@ bool test_kernel_equality(){
     }
   }
 
+  return true;
+}
+
+bool test_copy_kernel_to_gpu(){
+  for (size_t i = 3; i < 16; i+=2){
+    Kernel kernel(i);
+  
+    kernel.copy_to_gpu();
+  }
   return true;
 }
 
