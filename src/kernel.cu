@@ -124,7 +124,8 @@ void Kernel::copy_to_gpu(){
                                 cudaMemcpyDefault));
   }
 
-  errors.push_back(cudaMemcpy(d_gpu_values, d_gpu_values, sizeof(float*)*k,
+  errors.push_back(cudaMalloc(&d_gpu_values, sizeof(float*)*k));
+  errors.push_back(cudaMemcpy(d_gpu_values, gpu_values, sizeof(float*)*k,
                               cudaMemcpyDefault));
 
   for (size_t i = 0; i < errors.size(); i++){
