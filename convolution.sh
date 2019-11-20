@@ -1,4 +1,7 @@
 #!/bin/bash
+echo "hostname: $(hostname)"
+echo ""
+
 echo "------ CPU: ------"
 echo "running tests"
 ./convolution.out -t tests/saturn-v-2048x2048-bw.pgm
