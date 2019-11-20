@@ -146,3 +146,29 @@ void Image::randomize(){
   }
 }
 
+void Image::copy_to_gpu(){
+  is_on_gpu = true;
+
+  vector<cudaError_t> errors;
+
+  gpu_pixels = (float**)aligned_alloc(ALIGNMENT, sizeof(float*)*n);
+
+  for (size_t i = 0; i < m; i++){
+    errors.push_back(cudaMalloc(&gpu_pixels[i], sizeof(float)*n));
+    errors.push_back(cudaMemcpy(gpu_pixels[i], pixels[i], sizeof(float)*n,
+                                cudaMemcpyDefault));
+  }
+
+  errors.push_back(cudaMalloc(&d_gpu_pixels, sizeof(float*)*n));
+  errors.push_back(cudaMemcpy(d_gpu_pixels, gpu_pixels, sizeof(float*)*n,
+                              cudaMemcpyDefault));
+
+  for (size_t i = 0; i < errors.size(); i++){
+    if(errors[i] != 0){
+      cerr << "error number " << i << ": " 
+           << cudaGetErrorName(errors[i]) << endl
+           << cudaGetErrorString(errors[i]) << endl;
+    }
+  }
+}
+

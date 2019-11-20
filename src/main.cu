@@ -20,6 +20,7 @@ void run_tests(char arch, string image_input);
 bool test_image_equality(string image_input);
 bool test_kernel_equality();
 bool test_copy_kernel_to_gpu();
+bool test_copy_image_to_gpu();
 
 int main(int argc, char** argv){
   if (argc < 2){
@@ -193,6 +194,8 @@ void run_tests(char arch, string image_input){
     case 'g':
       printf("testing copy kernel to gpu: %i\n", 
              test_copy_kernel_to_gpu());
+      printf("testing copy image to gpu: %i\n", 
+             test_copy_image_to_gpu());
       break;
     default:
       cout << "invalid architecture specified!" << endl;
@@ -227,6 +230,17 @@ bool test_copy_kernel_to_gpu(){
     Kernel kernel(i);
   
     kernel.copy_to_gpu();
+  }
+  return true;
+}
+
+bool test_copy_image_to_gpu(){
+  auto coefficient = 100;
+  for (size_t i = 3; i < 16; i+=2){
+    Image image(i*coefficient, i*coefficient);
+  
+    image.randomize();
+    image.copy_to_gpu();
   }
   return true;
 }

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <string>
+#include <vector>
 
 #define ALIGNMENT 32
 #define BORDER_SIZE 7
@@ -26,7 +27,10 @@ class Image {
     // member utility functions
     float* at(size_t i, size_t j);
     float** pixels;
+    float** gpu_pixels;
+    float** d_gpu_pixels;
     void randomize();
+    void copy_to_gpu();
 
     // operators
     bool operator==(Image& other);
@@ -44,5 +48,7 @@ class Image {
     size_t n;
 
     void allocate_pixel_memory(size_t m, size_t n, bool pinned);
+
+    bool is_on_gpu;
 };
 
