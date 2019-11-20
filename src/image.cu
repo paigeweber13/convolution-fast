@@ -14,20 +14,34 @@ Image::Image(size_t m, size_t n, bool pinned){
 
 Image::~Image(){
   for(size_t i = 0; i < m+2*BORDER_SIZE; i++){
-    free(pixels[i]);
+    if(is_pinned)
+      cudaFree(pixels[i]);
+    else
+      free(pixels[i]);
   }
 
-  free(pixels);
+  if(is_pinned)
+    cudaFree(pixels);
+  else
+    free(pixels);
 }
 
 void Image::allocate_pixel_memory(size_t m, size_t n, bool pinned){
   this->m = m;
   this->n = n;
 
-  pixels = (float**)aligned_alloc(ALIGNMENT, sizeof(float*)*(m+BORDER_SIZE*2));
+  is_pinned = pinned;
+
+  if(pinned)
+    cudaMallocHost(&pixels, sizeof(float*)*(m+BORDER_SIZE*2));
+  else
+    pixels = (float**)aligned_alloc(ALIGNMENT, sizeof(float*)*(m+BORDER_SIZE*2));
 
   for(size_t i = 0; i < m+2*BORDER_SIZE; i++){
-    pixels[i] = (float*)aligned_alloc(ALIGNMENT, sizeof(float)*(n+BORDER_SIZE*2));
+    if(pinned)
+      cudaMallocHost(&pixels[i], sizeof(float*)*(n+BORDER_SIZE*2));
+    else
+      pixels[i] = (float*)aligned_alloc(ALIGNMENT, sizeof(float)*(n+BORDER_SIZE*2));
 
     if (i < BORDER_SIZE || i >= m){
       for(size_t j = 0; j < n+2*BORDER_SIZE; j++){

@@ -50,5 +50,6 @@ class Image {
     void allocate_pixel_memory(size_t m, size_t n, bool pinned);
 
     bool is_on_gpu;
+    bool is_pinned;
 };
 
