@@ -168,9 +168,10 @@ void Image::copy_to_gpu(){
   gpu_pixels = (float**)aligned_alloc(ALIGNMENT, sizeof(float*)*m);
 
   for (size_t i = 0; i < m; i++){
-    errors.push_back(cudaMalloc(&gpu_pixels[i], sizeof(float)*n));
-    errors.push_back(cudaMemcpy(gpu_pixels[i], pixels[i], sizeof(float)*n,
-                                cudaMemcpyDefault));
+    errors.push_back(cudaMalloc(&gpu_pixels[i], 
+      sizeof(float)*(n+2*BORDER_SIZE)));
+    errors.push_back(cudaMemcpy(gpu_pixels[i], pixels[i],
+      sizeof(float)*(n+2*BORDER_SIZE), cudaMemcpyDefault));
   }
 
   errors.push_back(cudaMalloc(&d_gpu_pixels, sizeof(float*)*m));
@@ -190,8 +191,8 @@ void Image::copy_from_gpu(){
   vector<cudaError_t> errors;
 
   for (size_t i = 0; i < m; i++){
-    errors.push_back(cudaMemcpy(pixels[i], gpu_pixels[i], sizeof(float)*n,
-                                cudaMemcpyDefault));
+    errors.push_back(cudaMemcpy(pixels[i], gpu_pixels[i],
+      sizeof(float)*(n+2*BORDER_SIZE), cudaMemcpyDefault));
   }
 
   for (size_t i = 0; i < errors.size(); i++){
