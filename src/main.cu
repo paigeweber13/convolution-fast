@@ -178,9 +178,11 @@ void test_blur_image(string input_filename, string output_filename, char arch){
   switch(arch){
     case 'c':
       convolve(image, blurred, kernel);
+      output_filename.insert(output_filename.size() - 4, "-cpu");
       break;
     case 'g':
       convolve_gpu(image, blurred, kernel);
+      output_filename.insert(output_filename.size() - 4, "-gpu");
       break;
   }
   cout << "finished blurring!" << endl;
