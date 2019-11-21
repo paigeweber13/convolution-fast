@@ -31,6 +31,7 @@ class Image {
     float** d_gpu_pixels;
     void randomize();
     void copy_to_gpu();
+    void copy_from_gpu();
 
     // operators
     bool operator==(Image& other);

@@ -186,3 +186,20 @@ void Image::copy_to_gpu(){
   }
 }
 
+void Image::copy_from_gpu(){
+  vector<cudaError_t> errors;
+
+  for (size_t i = 0; i < m; i++){
+    errors.push_back(cudaMemcpy(pixels[i], gpu_pixels[i], sizeof(float)*n,
+                                cudaMemcpyDefault));
+  }
+
+  for (size_t i = 0; i < errors.size(); i++){
+    if(errors[i] != 0){
+      cerr << "error number " << i << ": " 
+           << cudaGetErrorName(errors[i]) << endl
+           << cudaGetErrorString(errors[i]) << endl;
+    }
+  }
+}
+

@@ -6,6 +6,7 @@
 #include <string>
 
 #include "convolution.h"
+#include "convolution_gpu.h"
 #include "image.h"
 #include "kernel.h"
 
@@ -13,7 +14,7 @@ using namespace std;
 
 // function prototypes
 void print_help();
-void time_single_gpu_test(size_t m, size_t n, size_t k);
+double time_single_gpu_test(size_t m, size_t n, size_t k);
 double time_single_cpu_test(unsigned m, unsigned n, unsigned k);
 void test_blur_image(string input_filename, string output_filename, char arch);
 void run_tests(char arch, string image_input);
@@ -87,7 +88,7 @@ int main(int argc, char** argv){
         time = time_single_cpu_test(m, n, k);
         break;
       case 'g':
-        // time_single_gpu_test(m, n, k);
+        time = time_single_gpu_test(m, n, k);
         break;
       default:
         cout << "invalid architecture specified!" << endl;
@@ -124,14 +125,21 @@ void print_help(){
   exit(1);
 }
 
-void time_single_gpu_test(size_t m, size_t n, size_t k){
+double time_single_gpu_test(size_t m, size_t n, size_t k){
   auto input = Image(m, n);
   input.randomize();
   auto output = Image(m, n);
   Kernel kernel(k);
   kernel.make_blur_kernel();
 
-  convolve(input, output, kernel);
+  auto start_time = chrono::high_resolution_clock::now();
+
+  convolve_gpu(input, output, kernel);
+
+  auto end_time = chrono::high_resolution_clock::now();
+  auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+  const double nanoseconds_to_seconds = 1e9;
+  return duration/(nanoseconds_to_seconds);
 }
 
 double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
@@ -172,7 +180,7 @@ void test_blur_image(string input_filename, string output_filename, char arch){
       convolve(image, blurred, kernel);
       break;
     case 'g':
-      // convolve_gpu(image, blurred, kernel);
+      convolve_gpu(image, blurred, kernel);
       break;
   }
   cout << "finished blurring!" << endl;
