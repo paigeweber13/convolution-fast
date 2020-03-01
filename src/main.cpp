@@ -1,4 +1,4 @@
-#include <boost/program_options.hpp>
+// #include <boost/program_options.hpp>
 #include <chrono>
 #include <getopt.h>
 #include <iostream>
@@ -116,6 +116,7 @@ void time_single_gpu_test(size_t m, size_t n, size_t k){
   Kernel kernel(k);
   kernel.make_blur_kernel();
 
+  std::cout << "Warning! GPU convolution not implemented, running on CPU\n";
   convolve(input, output, kernel);
 }
 
