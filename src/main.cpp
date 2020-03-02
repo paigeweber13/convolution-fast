@@ -5,9 +5,12 @@
 #include <limits>
 #include <string>
 
+#include <performance_monitor.h>
+
 #include "convolution.h"
 #include "image.h"
 #include "kernel.h"
+// #include "../../lib/performance_monitor.h"
 
 using namespace std;
 
@@ -142,29 +145,50 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
 }
 
 void test_blur_image(string input_filename, string output_filename, char arch){
+  performance_monitor::init();
   cout << "Testing blur kernel on image " << input_filename << endl;
 
-  cout << "loading image..." << endl;
-  auto image = Image::load_image(input_filename);
-  // creating output for blurred
-  auto blurred = Image(image.get_m(), image.get_n());
-  cout << "finished loading!" << endl;
-
-  cout << "blurring..." << endl;
-  Kernel kernel(5);
-  kernel.make_blur_kernel();
-  switch(arch){
-    case 'c':
-      convolve(image, blurred, kernel);
-      break;
-    case 'g':
-      // convolve_gpu(image, blurred, kernel);
-      break;
+  const unsigned num_iter = 10;
+  #pragma omp parallel
+  {
+    // performance_monitor::startRegion("entire_program");
+    performance_monitor::startRegion("help");
   }
-  cout << "finished blurring!" << endl;
+  for (unsigned i = 0; i < num_iter; i++){
+    cout << "Iteration " + to_string(i+1) + " of " + to_string(num_iter) 
+          + "\n";
 
-  cout << "saving image to " << output_filename << endl;
-  Image::save_image(blurred, output_filename);
-  cout << "saving complete!" << endl;
+    cout << "loading image..." << endl;
+    auto image = Image::load_image(input_filename);
+    // creating output for blurred
+    auto blurred = Image(image.get_m(), image.get_n());
+    cout << "finished loading!" << endl;
+
+    cout << "blurring..." << endl;
+    Kernel kernel(5);
+    kernel.make_blur_kernel();
+    switch(arch){
+      case 'c':
+        convolve(image, blurred, kernel);
+        break;
+      case 'g':
+        // convolve_gpu(image, blurred, kernel);
+        break;
+    }
+    cout << "finished blurring!" << endl;
+
+    cout << "saving image to " << output_filename << endl;
+    Image::save_image(blurred, output_filename);
+    cout << "saving complete!" << endl;
+    cout << endl;
+
+    likwid_markerNextGroup();
+  }
+  #pragma omp parallel
+  {
+    // performance_monitor::stopRegion("entire_program");
+    performance_monitor::stopRegion("help");
+  }
+  performance_monitor::close();
+  performance_monitor::printResults();
 }
-

@@ -1,5 +1,6 @@
 #include "convolution.h"
 #include <iostream>
+#include <performance_monitor.h>
 
 void convolve(Image & input_image, Image & output_image, Kernel & kernel){
   size_t k = kernel.get_k();
@@ -21,6 +22,7 @@ void convolve(Image & input_image, Image & output_image, Kernel & kernel){
 
   #pragma omp parallel
   {
+    performance_monitor::startRegion("convolution");
     float sum;
     // #pragma omp for collapse(2)
     #pragma omp for
@@ -35,6 +37,7 @@ void convolve(Image & input_image, Image & output_image, Kernel & kernel){
         output_image.pixels[y][x] = uint8_t(sum);
       }
     }
+    performance_monitor::stopRegion("convolution");
   }
 }
 
