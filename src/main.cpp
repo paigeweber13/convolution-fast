@@ -124,8 +124,8 @@ void time_single_gpu_test(size_t m, size_t n, size_t k){
 }
 
 double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
+  performance_monitor::init();
   // Convolve them and report time.
-  size_t num_runs = 1;
   auto input = Image(m, n);
   input.randomize();
   auto output = Image(m, n);
@@ -134,14 +134,15 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
 
   auto start_time = chrono::high_resolution_clock::now();
 
-  for(size_t i = 0; i < num_runs; i++){
-    convolve(input, output, kernel);
-  }
+  convolve(input, output, kernel);
 
   auto end_time = chrono::high_resolution_clock::now();
   auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
   const double nanoseconds_to_seconds = 1e9;
-  return duration/(num_runs*nanoseconds_to_seconds);
+
+  performance_monitor::close();
+  performance_monitor::printResults();
+  return duration/(nanoseconds_to_seconds);
 }
 
 void test_blur_image(string input_filename, string output_filename, char arch){
@@ -151,8 +152,7 @@ void test_blur_image(string input_filename, string output_filename, char arch){
   const unsigned num_iter = 10;
   #pragma omp parallel
   {
-    // performance_monitor::startRegion("entire_program");
-    performance_monitor::startRegion("help");
+    performance_monitor::startRegion("entire_program");
   }
   for (unsigned i = 0; i < num_iter; i++){
     cout << "Iteration " + to_string(i+1) + " of " + to_string(num_iter) 
@@ -186,8 +186,7 @@ void test_blur_image(string input_filename, string output_filename, char arch){
   }
   #pragma omp parallel
   {
-    // performance_monitor::stopRegion("entire_program");
-    performance_monitor::stopRegion("help");
+    performance_monitor::stopRegion("entire_program");
   }
   performance_monitor::close();
   performance_monitor::printResults();
