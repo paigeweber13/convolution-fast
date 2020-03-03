@@ -70,9 +70,18 @@ int main(int argc, char** argv){
     auto k = stoul(argv[optind+2]);
 
     double time = numeric_limits<double>::infinity();
+    const unsigned num_iter = 10;
     switch (arch) {
       case 'c':
-        time = time_single_cpu_test(m, n, k);
+        performance_monitor::init();
+        for (unsigned i = 0; i < num_iter; i++){
+          cout << "Iteration " + to_string(i+1) + " of " + to_string(num_iter) 
+                + "\n";
+          time = time_single_cpu_test(m, n, k);
+          likwid_markerNextGroup();
+        }
+        performance_monitor::close();
+        performance_monitor::printResults();
         break;
       case 'g':
         // time_single_gpu_test(m, n, k);
@@ -124,7 +133,6 @@ void time_single_gpu_test(size_t m, size_t n, size_t k){
 }
 
 double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
-  performance_monitor::init();
   // Convolve them and report time.
   auto input = Image(m, n);
   input.randomize();
@@ -140,8 +148,6 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
   auto duration = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
   const double nanoseconds_to_seconds = 1e9;
 
-  performance_monitor::close();
-  performance_monitor::printResults();
   return duration/(nanoseconds_to_seconds);
 }
 
