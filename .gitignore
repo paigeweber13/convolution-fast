@@ -7,3 +7,4 @@ convolution
 *.pgm
 core.*
 *.sh.*
+*.json
