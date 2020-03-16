@@ -64,31 +64,39 @@ int main(int argc, char** argv){
     opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
   }
 
-  if (speedtest) {
+  if (speedtest)
+  {
     auto m = stoul(argv[optind]);
-    auto n = stoul(argv[optind+1]);
-    auto k = stoul(argv[optind+2]);
+    auto n = stoul(argv[optind + 1]);
+    auto k = stoul(argv[optind + 2]);
 
     double time = numeric_limits<double>::infinity();
     const unsigned num_iter = 10;
-    switch (arch) {
-      case 'c':
-        performance_monitor::init();
-        for (unsigned i = 0; i < num_iter; i++){
-          cout << "Iteration " + to_string(i+1) + " of " + to_string(num_iter) 
-                + "\n";
-          time = time_single_cpu_test(m, n, k);
-          likwid_markerNextGroup();
-        }
-        performance_monitor::close();
-        performance_monitor::printResults();
-        break;
-      case 'g':
-        // time_single_gpu_test(m, n, k);
-        break;
-      default:
-        cout << "invalid architecture specified!" << endl;
-        return 2;
+    switch (arch)
+    {
+    case 'c':
+      // seems to cause error " ERROR - [./src/perfmon.c:perfmon_setupCounters:2217] No such file or directory.
+      // Group 4 does not exist in groupSet "
+
+      // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE");
+      performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2");
+      for (unsigned i = 0; i < num_iter; i++)
+      {
+        cout << "Iteration " + to_string(i + 1) + " of " + to_string(num_iter) + "\n";
+        time = time_single_cpu_test(m, n, k);
+        likwid_markerNextGroup();
+      }
+      performance_monitor::close();
+      // performance_monitor::printResults();
+      performance_monitor::printOnlyAggregate();
+      performance_monitor::printComparison();
+      break;
+    case 'g':
+      // time_single_gpu_test(m, n, k);
+      break;
+    default:
+      cout << "invalid architecture specified!" << endl;
+      return 2;
     }
 
     const double pixels_to_megapixels = 1e-6;
@@ -152,13 +160,14 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
 }
 
 void test_blur_image(string input_filename, string output_filename, char arch){
-  performance_monitor::init();
+  // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE");
+  performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2");
   cout << "Testing blur kernel on image " << input_filename << endl;
 
   const unsigned num_iter = 10;
   #pragma omp parallel
   {
-    performance_monitor::startRegion("entire_program");
+    performance_monitor::startRegion("entire");
   }
   for (unsigned i = 0; i < num_iter; i++){
     cout << "Iteration " + to_string(i+1) + " of " + to_string(num_iter) 
@@ -192,8 +201,12 @@ void test_blur_image(string input_filename, string output_filename, char arch){
   }
   #pragma omp parallel
   {
-    performance_monitor::stopRegion("entire_program");
+    performance_monitor::stopRegion("entire");
   }
   performance_monitor::close();
-  performance_monitor::printResults();
+  // performance_monitor::printResults();
+  // WARNING: does not aggregate by group, so if I do get both groups working
+  // that will need to be fixed
+  performance_monitor::printOnlyAggregate();
+  performance_monitor::printComparison();
 }
