@@ -1,6 +1,5 @@
 #include "convolution.h"
 #include <iostream>
-#include <performance_monitor.h>
 
 void convolve(Image & input_image, Image & output_image, Kernel & kernel){
   size_t k = kernel.get_k();

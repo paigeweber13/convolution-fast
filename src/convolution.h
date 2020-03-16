@@ -10,6 +10,7 @@
 #include <vector>
 
 // my stuff
+#include <performance_monitor.h>
 #include "image.h"
 #include "kernel.h"
 
