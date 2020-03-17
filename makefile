@@ -1,14 +1,15 @@
 #include build/conanbuildinfo.mak
 
 CXX=g++
-CXXFLAGS=-g -std=c++11 -Wall -march=native -mtune=native -fopenmp -O3 $(LIBRARY_FLAGS) -DLIKWID_PERFMON
-CUDAFLAGS=-g -std=c++11 -Xcompiler "-Wall -march=native -mtune=native -fopenmp -O3"
+CXXFLAGS=-g -std=c++14 -Wall -march=native -mtune=native -fopenmp -O3 $(LIBRARY_FLAGS) -DLIKWID_PERFMON
+CUDAFLAGS=-g -std=c++14 -Xcompiler "-Wall -march=native -mtune=native -fopenmp -O3"
 #CXXASSEMBLYFLAGS=-S -fverbose-asm
 CUDAC=nvcc
 # INCLUDES=-I/opt/arrayfire/include
 # LIBRARIES=-L/opt/arrayfire/lib64
 # LIBRARY_FLAGS=-laf
 INCLUDES=-I/home/riley/code/fine-hardware-visualization/lib
+INCLUDES+=-I../lib
 LIBRARIES=-L/usr/local/lib
 LIBRARY_FLAGS=-llikwid
 FILES=$(wildcard src/*.cpp) $(wildcard /home/riley/code/fine-hardware-visualization/lib/*.cpp) 
