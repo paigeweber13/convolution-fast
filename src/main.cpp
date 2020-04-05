@@ -161,13 +161,18 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
 
 void test_blur_image(string input_filename, string output_filename, char arch){
   // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE");
-  performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2");
+  // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2");
+
+  // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE1");
+  // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE1|PORT_USAGE2");
+
+  performance_monitor::init("MEM_SP|L3|L2|PORT_USAGE1|PORT_USAGE2|PORT_USAGE3");
   cout << "Testing blur kernel on image " << input_filename << endl;
 
-  const unsigned num_iter = 10;
-  #pragma omp parallel
+  const unsigned num_iter = 12;
+  // #pragma omp parallel
   {
-    performance_monitor::startRegion("entire");
+    performance_monitor::startRegion("entire_program");
   }
   for (unsigned i = 0; i < num_iter; i++){
     cout << "Iteration " + to_string(i+1) + " of " + to_string(num_iter) 
@@ -182,14 +187,7 @@ void test_blur_image(string input_filename, string output_filename, char arch){
     cout << "blurring..." << endl;
     Kernel kernel(5);
     kernel.make_blur_kernel();
-    switch(arch){
-      case 'c':
-        convolve(image, blurred, kernel);
-        break;
-      case 'g':
-        // convolve_gpu(image, blurred, kernel);
-        break;
-    }
+    convolve(image, blurred, kernel);
     cout << "finished blurring!" << endl;
 
     cout << "saving image to " << output_filename << endl;
@@ -199,9 +197,9 @@ void test_blur_image(string input_filename, string output_filename, char arch){
 
     likwid_markerNextGroup();
   }
-  #pragma omp parallel
+  // #pragma omp parallel
   {
-    performance_monitor::stopRegion("entire");
+    performance_monitor::stopRegion("entire_program");
   }
   performance_monitor::close();
   // performance_monitor::printResults();
