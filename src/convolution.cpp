@@ -21,7 +21,8 @@ void convolve(Image & input_image, Image & output_image, Kernel & kernel){
 
   #pragma omp parallel
   {
-    performance_monitor::startRegion("convolution");
+    // performance_monitor::startRegion("convolution");
+    likwid_markerStartRegion("convolution");
     float sum;
     // #pragma omp for collapse(2)
     #pragma omp for
@@ -36,7 +37,8 @@ void convolve(Image & input_image, Image & output_image, Kernel & kernel){
         output_image.pixels[y][x] = uint8_t(sum);
       }
     }
-    performance_monitor::stopRegion("convolution");
+    // performance_monitor::stopRegion("convolution");
+    likwid_markerStopRegion("convolution");
   }
 }
 

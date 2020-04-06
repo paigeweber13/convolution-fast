@@ -2,6 +2,7 @@
 #include <chrono>
 #include <getopt.h>
 #include <iostream>
+// #include <likwid.h>
 #include <limits>
 #include <string>
 
@@ -160,24 +161,34 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
 }
 
 void test_blur_image(string input_filename, string output_filename, char arch){
+  // if you choose not to initialize here, you may run with the likwid-perfctr
+  // command line tool. Example:
+
+  // likwid-perfctr -C S0:0-3 -g PORT_USAGE1 -g PORT_USAGE2 -g PORT_USAGE3 -M 1 -m "./convolution.out -i tests/saturn-v-2048x2048-bw.pgm -o tests/output.pgm"
+
   // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE");
   // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2");
 
   // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE1");
   // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE1|PORT_USAGE2");
 
-  performance_monitor::init("MEM_SP|L3|L2|PORT_USAGE1|PORT_USAGE2|PORT_USAGE3");
+  // performance_monitor::init("MEM_SP|L3|L2|PORT_USAGE1|PORT_USAGE2|PORT_USAGE3");
   cout << "Testing blur kernel on image " << input_filename << endl;
 
-  const unsigned num_iter = 12;
-  // #pragma omp parallel
+  const unsigned num_iter = 10;
+  likwid_markerInit();
+  #pragma omp parallel
   {
-    performance_monitor::startRegion("entire_program");
+    // performance_monitor::startRegion("entire_program");
+    likwid_markerThreadInit();
+    likwid_markerRegisterRegion("convolution");
   }
+  likwid_markerRegisterRegion("entire_program");
   for (unsigned i = 0; i < num_iter; i++){
     cout << "Iteration " + to_string(i+1) + " of " + to_string(num_iter) 
           + "\n";
 
+    likwid_markerStartRegion("entire_program");
     cout << "loading image..." << endl;
     auto image = Image::load_image(input_filename);
     // creating output for blurred
@@ -194,17 +205,19 @@ void test_blur_image(string input_filename, string output_filename, char arch){
     Image::save_image(blurred, output_filename);
     cout << "saving complete!" << endl;
     cout << endl;
+    likwid_markerStopRegion("entire_program");
 
     likwid_markerNextGroup();
   }
   // #pragma omp parallel
   {
-    performance_monitor::stopRegion("entire_program");
+    // performance_monitor::stopRegion("entire_program");
   }
-  performance_monitor::close();
+  likwid_markerClose();
+  // performance_monitor::close();
   // performance_monitor::printResults();
   // WARNING: does not aggregate by group, so if I do get both groups working
   // that will need to be fixed
-  performance_monitor::printOnlyAggregate();
-  performance_monitor::printComparison();
+  // performance_monitor::printOnlyAggregate();
+  // performance_monitor::printComparison();
 }
