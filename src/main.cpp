@@ -80,17 +80,25 @@ int main(int argc, char** argv){
       // Group 4 does not exist in groupSet "
 
       // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE");
-      performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2");
+      // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2");
+      likwid_markerInit();
+      #pragma omp parallel
+      {
+        // performance_monitor::startRegion("entire_program");
+        likwid_markerThreadInit();
+        likwid_markerRegisterRegion("convolution");
+      }
       for (unsigned i = 0; i < num_iter; i++)
       {
-        cout << "Iteration " + to_string(i + 1) + " of " + to_string(num_iter) + "\n";
+        // cout << "Iteration " + to_string(i + 1) + " of " + to_string(num_iter) + "\n";
         time = time_single_cpu_test(m, n, k);
         likwid_markerNextGroup();
       }
-      performance_monitor::close();
+      likwid_markerClose();
+      // performance_monitor::close();
       // performance_monitor::printResults();
-      performance_monitor::printOnlyAggregate();
-      performance_monitor::printComparison();
+      // performance_monitor::printOnlyAggregate();
+      // performance_monitor::printComparison();
       break;
     case 'g':
       // time_single_gpu_test(m, n, k);

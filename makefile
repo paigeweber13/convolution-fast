@@ -45,6 +45,11 @@ test: cpu
 	# ./queue.sh convolution.sh
 	./convolution.out -i tests/saturn-v-2048x2048-bw.pgm -o tests/output.pgm
 
+likwid-test: cpu
+	likwid-perfctr -C S0:0-3 -g PORT_USAGE1 -g PORT_USAGE2 -g PORT_USAGE3 -M 1 -m "./convolution.out -i tests/saturn-v-2048x2048-bw.pgm -o tests/output.pgm"
+
+likwid-speedtest: cpu
+	likwid-perfctr -C S0:0-3 -g PORT_USAGE1 -g PORT_USAGE2 -g PORT_USAGE3 -M 1 -m "./convolution.out -s 2000 2000 9"
 
 clean:
 	rm -f *.e* *.o* *.s
