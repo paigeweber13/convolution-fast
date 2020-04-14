@@ -65,6 +65,28 @@ int main(int argc, char** argv){
     opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
   }
 
+  // actual work below
+
+  // so 14 group/region combos
+  setenv("LIKWID_EVENTS",
+         "MEM|L2|L3|FLOPS_SP|FLOPS_DP|PORT_USAGE1|PORT_USAGE2|PORT_USAGE3",
+         1);
+  // setenv("LIKWID_EVENTS", "MEM_DP|L2", 1);
+  setenv("LIKWID_MODE", "1", 1);
+  // output filepath
+  setenv("LIKWID_FILEPATH", performance_monitor::likwidOutputFilepath.c_str(), 
+         1); 
+  setenv("LIKWID_THREADS", "0,1,2,3", 1); // list of threads
+  setenv("LIKWID_FORCE", "1", 1);
+
+  likwid_markerInit();
+  #pragma omp parallel
+  {
+    // performance_monitor::startRegion("entire_program");
+    likwid_markerThreadInit();
+    likwid_pinThread(omp_get_thread_num());
+  }
+
   if (speedtest)
   {
     auto m = stoul(argv[optind]);
@@ -76,16 +98,9 @@ int main(int argc, char** argv){
     switch (arch)
     {
     case 'c':
-      // seems to cause error " ERROR - [./src/perfmon.c:perfmon_setupCounters:2217] No such file or directory.
-      // Group 4 does not exist in groupSet "
 
-      // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE");
-      // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2");
-      likwid_markerInit();
       #pragma omp parallel
       {
-        // performance_monitor::startRegion("entire_program");
-        likwid_markerThreadInit();
         likwid_markerRegisterRegion("convolution");
       }
       for (unsigned i = 0; i < num_iter; i++)
@@ -94,11 +109,7 @@ int main(int argc, char** argv){
         time = time_single_cpu_test(m, n, k);
         likwid_markerNextGroup();
       }
-      likwid_markerClose();
-      // performance_monitor::close();
-      // performance_monitor::printResults();
-      // performance_monitor::printOnlyAggregate();
-      // performance_monitor::printComparison();
+
       break;
     case 'g':
       // time_single_gpu_test(m, n, k);
@@ -115,8 +126,21 @@ int main(int argc, char** argv){
            / (time));
   }
   else {
+
+    #pragma omp parallel
+    {
+      likwid_markerRegisterRegion("convolution");
+    }
+    likwid_markerRegisterRegion("entire_program");
+
     test_blur_image(image_input, image_output, arch);
   }
+
+  likwid_markerClose();
+
+  performance_monitor::getAggregateResults();
+  performance_monitor::compareActualWithBench();
+  performance_monitor::printComparison();
 
   return 0;
 }
@@ -169,29 +193,10 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
 }
 
 void test_blur_image(string input_filename, string output_filename, char arch){
-  // if you choose not to initialize here, you may run with the likwid-perfctr
-  // command line tool. Example:
-
-  // likwid-perfctr -C S0:0-3 -g PORT_USAGE1 -g PORT_USAGE2 -g PORT_USAGE3 -M 1 -m "./convolution.out -i tests/saturn-v-2048x2048-bw.pgm -o tests/output.pgm"
-
-  // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE");
-  // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2");
-
-  // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE1");
-  // performance_monitor::init("MEM_DP|FLOPS_SP|L3|L2|PORT_USAGE1|PORT_USAGE2");
-
-  // performance_monitor::init("MEM_SP|L3|L2|PORT_USAGE1|PORT_USAGE2|PORT_USAGE3");
   cout << "Testing blur kernel on image " << input_filename << endl;
 
   const unsigned num_iter = 10;
-  likwid_markerInit();
-  #pragma omp parallel
-  {
-    // performance_monitor::startRegion("entire_program");
-    likwid_markerThreadInit();
-    likwid_markerRegisterRegion("convolution");
-  }
-  likwid_markerRegisterRegion("entire_program");
+
   for (unsigned i = 0; i < num_iter; i++){
     cout << "Iteration " + to_string(i+1) + " of " + to_string(num_iter) 
           + "\n";
@@ -217,15 +222,4 @@ void test_blur_image(string input_filename, string output_filename, char arch){
 
     likwid_markerNextGroup();
   }
-  // #pragma omp parallel
-  {
-    // performance_monitor::stopRegion("entire_program");
-  }
-  likwid_markerClose();
-  // performance_monitor::close();
-  // performance_monitor::printResults();
-  // WARNING: does not aggregate by group, so if I do get both groups working
-  // that will need to be fixed
-  // performance_monitor::printOnlyAggregate();
-  // performance_monitor::printComparison();
 }
