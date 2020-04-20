@@ -26,9 +26,10 @@ int main(int argc, char** argv){
     print_help();
   }
 
-  const char* const short_opts = "ha:i:o:s";
+  const char* const short_opts = "hpa:i:o:s";
   const option long_opts[] = {
     {"help", no_argument, nullptr, 'h'},
+    {"perfmon-output", no_argument, nullptr, 'p'},
     {"arch", required_argument, nullptr, 'a'},
     {"image-input", required_argument, nullptr, 'i'},
     {"image-output", required_argument, nullptr, 'o'},
@@ -40,6 +41,7 @@ int main(int argc, char** argv){
   string image_input = "";
   string image_output = "output.pgm";
   bool speedtest = false;
+  bool perfmon_output = false;
 
   auto opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
   while (opt != -1) {
@@ -55,6 +57,9 @@ int main(int argc, char** argv){
         break;
       case 's':
         speedtest = true;
+        break;
+      case 'p':
+        perfmon_output = true;
         break;
 
       case 'h':
@@ -138,9 +143,11 @@ int main(int argc, char** argv){
 
   likwid_markerClose();
 
-  performance_monitor::getAggregateResults();
-  performance_monitor::compareActualWithBench();
-  performance_monitor::printComparison();
+  if(perfmon_output){
+    performance_monitor::getAggregateResults();
+    performance_monitor::compareActualWithBench();
+    performance_monitor::printComparison();
+  }
 
   return 0;
 }
@@ -158,7 +165,9 @@ void print_help(){
   "                                 supported.\n"
   "  -s, --speedtest <m> <n> <k>:   time a test with given image size m, n\n"
   "                                 and kernel size k. Speedtest will\n"
-  "                                 output \"m, n, k, time (s), Mp/s\"\n";
+  "                                 output \"m, n, k, time (s), Mp/s\"\n"
+  "  -p, --perfmon-output:          output performance data with the fhv\n"
+  "                                 performance monitor\n";
   exit(1);
 }
 
@@ -176,7 +185,7 @@ void time_single_gpu_test(size_t m, size_t n, size_t k){
 double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
   // Convolve them and report time.
   auto input = Image(m, n);
-  input.randomize();
+  // input.randomize();
   auto output = Image(m, n);
   Kernel kernel(k);
   kernel.make_blur_kernel();
