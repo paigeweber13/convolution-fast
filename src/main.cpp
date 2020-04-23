@@ -144,7 +144,7 @@ int main(int argc, char** argv){
   likwid_markerClose();
 
   if(perfmon_output){
-    performance_monitor::getAggregateResults();
+    performance_monitor::buildResultsMaps();
     performance_monitor::compareActualWithBench();
     performance_monitor::printComparison();
   }
