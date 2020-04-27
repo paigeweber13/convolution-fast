@@ -146,7 +146,9 @@ int main(int argc, char** argv){
   if(perfmon_output){
     performance_monitor::buildResultsMaps();
     performance_monitor::compareActualWithBench();
-    performance_monitor::printComparison();
+
+    performance_monitor::printHighlights();
+    // performance_monitor::printComparison();
   }
 
   return 0;
@@ -204,7 +206,7 @@ double time_single_cpu_test(unsigned m, unsigned n, unsigned k){
 void test_blur_image(string input_filename, string output_filename, char arch){
   cout << "Testing blur kernel on image " << input_filename << endl;
 
-  const unsigned num_iter = 10;
+  const unsigned num_iter = 8;
 
   for (unsigned i = 0; i < num_iter; i++){
     cout << "Iteration " + to_string(i+1) + " of " + to_string(num_iter) 
