@@ -52,4 +52,4 @@ likwid-speedtest: cpu
 	likwid-perfctr -C S0:0-3 -g PORT_USAGE1 -g PORT_USAGE2 -g PORT_USAGE3 -M 1 -m "./convolution.out -s 2000 2000 9"
 
 clean:
-	rm -f *.e* *.o* *.s
+	rm -f *.e* *.o* *.s $(OBJS) $(EXEC)
