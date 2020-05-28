@@ -26,10 +26,11 @@ int main(int argc, char** argv){
     print_help();
   }
 
-  const char* const short_opts = "hpa:i:o:s";
+  const char* const short_opts = "hpla:i:o:s";
   const option long_opts[] = {
     {"help", no_argument, nullptr, 'h'},
     {"perfmon-output", no_argument, nullptr, 'p'},
+    {"use-likwid-cli", no_argument, nullptr, 'l'},
     {"arch", required_argument, nullptr, 'a'},
     {"image-input", required_argument, nullptr, 'i'},
     {"image-output", required_argument, nullptr, 'o'},
@@ -42,6 +43,7 @@ int main(int argc, char** argv){
   string image_output = "output.pgm";
   bool speedtest = false;
   bool perfmon_output = false;
+  bool use_likwid_cli = false;
 
   auto opt = getopt_long(argc, argv, short_opts, long_opts, nullptr);
   while (opt != -1) {
@@ -58,6 +60,9 @@ int main(int argc, char** argv){
       case 's':
         speedtest = true;
         break;
+      case 'l':
+        use_likwid_cli = true;
+        break;
       case 'p':
         perfmon_output = true;
         break;
@@ -72,17 +77,19 @@ int main(int argc, char** argv){
 
   // actual work below
 
-  // so 14 group/region combos
-  setenv("LIKWID_EVENTS",
-         "MEM|L2|L3|FLOPS_SP|FLOPS_DP|PORT_USAGE1|PORT_USAGE2|PORT_USAGE3",
-         1);
-  // setenv("LIKWID_EVENTS", "MEM_DP|L2", 1);
-  setenv("LIKWID_MODE", "1", 1);
-  // output filepath
-  setenv("LIKWID_FILEPATH", performance_monitor::likwidOutputFilepath.c_str(), 
-         1); 
-  setenv("LIKWID_THREADS", "0,1,2,3", 1); // list of threads
-  setenv("LIKWID_FORCE", "1", 1);
+  if(!use_likwid_cli){
+    // so 14 group/region combos
+    setenv("LIKWID_EVENTS",
+           "MEM|L2|L3|FLOPS_SP|FLOPS_DP|PORT_USAGE1|PORT_USAGE2|PORT_USAGE3",
+           1);
+    // setenv("LIKWID_EVENTS", "MEM_DP|L2", 1);
+    setenv("LIKWID_MODE", "1", 1);
+    // output filepath
+    setenv("LIKWID_FILEPATH", performance_monitor::likwidOutputFilepath.c_str(), 
+           1); 
+    setenv("LIKWID_THREADS", "0,1,2,3", 1); // list of threads
+    setenv("LIKWID_FORCE", "1", 1);
+  }
 
   likwid_markerInit();
   #pragma omp parallel
@@ -148,6 +155,7 @@ int main(int argc, char** argv){
     performance_monitor::compareActualWithBench();
 
     performance_monitor::printHighlights();
+    performance_monitor::resultsToJson();
     // performance_monitor::printComparison();
   }
 
@@ -169,7 +177,11 @@ void print_help(){
   "                                 and kernel size k. Speedtest will\n"
   "                                 output \"m, n, k, time (s), Mp/s\"\n"
   "  -p, --perfmon-output:          output performance data with the fhv\n"
-  "                                 performance monitor\n";
+  "                                 performance monitor. This option is\n"
+  "                                 mutually exclusive with '-l'\n"
+  "  -l, --use-likwid-cli:          don't set likwid envvar so that likwid\n"
+  "                                 perfctr cli may be used. This option \n"
+  "                                 is mutually exclusive with -p.\n";
   exit(1);
 }
 
