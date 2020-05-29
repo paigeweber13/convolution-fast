@@ -15,6 +15,37 @@
 
 using namespace std;
 
+#ifdef LIKWID_CLI
+int main(int argc, char ** argv){
+  int m = std::stoi(argv[1]);
+  int n = std::stoi(argv[2]);
+  int k = std::stoi(argv[3]);
+  int nbiter = std::stoi(argv[4]);
+
+  likwid_markerInit();
+  #pragma omp parallel
+  {
+    // performance_monitor::startRegion("entire_program");
+    likwid_markerThreadInit();
+    likwid_markerRegisterRegion("convolution");
+    likwid_pinThread(omp_get_thread_num());
+  }
+
+  auto input = Image(m, n);
+  auto output = Image(m, n);
+  Kernel kernel(k);
+  kernel.make_blur_kernel();
+
+  for (size_t i = 0; i < static_cast<size_t>(nbiter); i++)
+  {
+    convolve(input, output, kernel);
+    likwid_markerNextGroup();
+  }
+
+  likwid_markerClose();
+}
+#else
+
 // function prototypes
 void print_help();
 void time_single_gpu_test(size_t m, size_t n, size_t k);
@@ -246,3 +277,4 @@ void test_blur_image(string input_filename, string output_filename, char arch){
     likwid_markerNextGroup();
   }
 }
+#endif

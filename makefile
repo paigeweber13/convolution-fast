@@ -1,7 +1,7 @@
 #include build/conanbuildinfo.mak
 
 CXX=g++
-CXXFLAGS=-g -std=c++14 -Wall -march=native -mtune=native -fopenmp -O3 $(LIBRARY_FLAGS) -DLIKWID_PERFMON
+CXXFLAGS=-g -DLIKWID_CLI -std=c++14 -Wall -march=native -mtune=native -fopenmp -O3 $(LIBRARY_FLAGS) -DLIKWID_PERFMON
 CUDAFLAGS=-g -std=c++14 -Xcompiler "-Wall -march=native -mtune=native -fopenmp -O3"
 #CXXASSEMBLYFLAGS=-S -fverbose-asm
 CUDAC=nvcc
