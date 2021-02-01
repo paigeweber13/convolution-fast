@@ -1,0 +1,36 @@
+BASIC CODE QUESTIONS:
+Question: Port the convolution kernel to the GPU.
+ - I converted the kernel and image objects to be able to be used on the GPU
+ - I created a function "copy_to_gpu" in the kernel object, but was unable to
+   test it, everything I did gave me the error "cudaErrorInsufficientDriver".
+
+Question: Benchmark its performance using different image size and convolution
+dimension. (Ignore pci- express transfer in measurement)
+ - got about 5 Mpixels/s on gpu
+
+Question: What is the expected performance?
+ - GPU memory bandwidth: (read/write): 4.006 TB/s
+ - flop/s (theoretical): 4.38 TFlop/s
+ - required flops: f(k, n, m) = n * m * 2 * k * k 
+ - required read/write (n * m) * datatype_size bytes
+ - for image 2048x2048, kernel size 5:
+   - expected flop performance bound = pixels / (req_flops / flop/s)
+       = 4,194,304 / (4,194,304*2*25 / 4.38e12)
+       = 87.6 GPixels/s
+   - expected memory performance bound = pixels / (req_mem / bandwidth)
+       = 4,194,304 / (4,194,304*4 / 4.006e12)
+       = 1 TPixels/s
+  - expected performance is 87.6 GPixels/s
+
+OPT CODE QUESTIONS:
+Question: Optimize the convolution kernel. In particular be mindful of
+• Occupancy
+• Coalescing
+• Shared memory (and bank conflicts)
+ - I couldn't even get basic GPU code working
+
+Question: Benchmark performance of optimized kernel. How does that compare to
+the previous version and to expected performance? (Note: Higher performance
+will lead to higher marks.)
+ - No benchmark available
+
