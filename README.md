@@ -13,7 +13,12 @@ first, make sure you have conan installed (`pip install conan`)
     make
 
 # TODO:
- - image output has borders
+ - try to improve speedup on openGL implementation
+ - remove borders on image output
  - write GPU code
  - use CPU code to check GPU code for correctness
+ - write convolution with other frameworks and compare speed
+   - HPX
+   - ArrayFire?
+   - C++20 coroutines
 
